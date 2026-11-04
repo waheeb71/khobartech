@@ -329,6 +329,16 @@ export default async function HomePage({
       </section>
 
       {/* ============================
+          STRATEGIC SECTORS
+      ============================*/}
+      <SectorsGrid locale={l} />
+
+      {/* ============================
+          ENTERPRISE CASE STUDIES
+      ============================*/}
+      <CaseStudiesSection locale={l} />
+
+      {/* ============================
           ABOUT / PROCESS
       ============================*/}
       <section

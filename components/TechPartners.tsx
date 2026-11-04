@@ -169,3 +169,4 @@ export function TechPartners({ locale }: TechPartnersProps) {
     </section>
   );
 }
+

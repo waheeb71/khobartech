@@ -155,3 +155,4 @@ export function CaseStudiesSection({ locale }: CaseStudiesProps) {
     </section>
   );
 }
+

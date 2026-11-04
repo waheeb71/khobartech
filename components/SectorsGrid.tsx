@@ -128,3 +128,4 @@ export function SectorsGrid({ locale }: SectorsGridProps) {
     </section>
   );
 }
+
