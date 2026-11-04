@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpLeft, MoveUpLeft, BookOpen } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
@@ -16,10 +16,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({
     locale,
     path: "/blog",
-    title: locale === "ar" ? "المدونة والرؤى التقنية | تكنلوجيا الخبير" : "Insights & Blog | Khobar Tech",
+    title: locale === "ar" ? "المدونة والرؤى التقنية | تكنولوجيا الخبر" : "Insights & Blog | Khobar Tech",
     description:
       locale === "ar"
-        ? "مقالات ورؤى تقنية متخصصة من خبراء تكنلوجيا الخبير حول أنظمة المؤسسات، الذكاء الاصطناعي، الأمن السيبراني، وأفضل ممارسات التحول الرقمي."
+        ? "مقالات ورؤى تقنية متخصصة من خبراء تكنولوجيا الخبر حول أنظمة المؤسسات، الذكاء الاصطناعي، الأمن السيبراني، وأفضل ممارسات التحول الرقمي."
         : "Expert articles and technology insights from Khobar Tech on ERP systems, AI, cybersecurity, and digital transformation.",
   });
 }
@@ -37,7 +37,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
         data={{
           "@context": "https://schema.org",
           "@type": "Blog",
-          name: l === "ar" ? "مدونة تكنلوجيا الخبير" : "Khobar Tech Insights",
+          name: l === "ar" ? "مدونة تكنولوجيا الخبر" : "Khobar Tech Insights",
         }}
       />
 
@@ -46,7 +46,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
         <div className="page-hero-bg">
           <PhotoFrame
             src="/hero.jpg"
-            alt={l === "ar" ? "خلفية مدونة تكنلوجيا الخبير" : "Khobar Tech blog background"}
+            alt={l === "ar" ? "خلفية مدونة تكنولوجيا الخبر" : "Khobar Tech blog background"}
             className="absolute inset-0 h-full w-full"
             priority
             sizes="100vw"
@@ -154,3 +154,4 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
     </>
   );
 }
+

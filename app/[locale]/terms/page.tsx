@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import type { Locale } from "@/lib/catalog";
 import { isLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/seo";
@@ -10,10 +10,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({
     locale,
     path: "/terms",
-    title: locale === "ar" ? "الشروط والأحكام | تكنلوجيا الخبير" : "Terms & Conditions | Khobar Tech",
+    title: locale === "ar" ? "الشروط والأحكام | تكنولوجيا الخبر" : "Terms & Conditions | Khobar Tech",
     description:
       locale === "ar"
-        ? "شروط وأحكام استخدام موقع شركة تكنلوجيا الخبير."
+        ? "شروط وأحكام استخدام موقع شركة تكنولوجيا الخبر."
         : "Terms and conditions for using the Khobar Tech website.",
   });
 }
@@ -24,8 +24,8 @@ export default async function Terms({ params }: { params: Promise<{ locale: stri
   const ar = locale === "ar";
   const sections = ar
     ? [
-        ["استخدام الموقع", "المحتوى المنشور في الموقع مخصص للتعريف بخدمات وحلول شركة تكنلوجيا الخبير. تفاصيل المشاريع ونطاق العمل والاتفاقيات ملزمة فقط عبر العقود الرسمية الموقعة."],
-        ["الملكية الفكرية", "جميع المحتويات والعلامات التجارية والنصوص والتصميمات المنشورة ملك لشركة تكنلوجيا الخبير وشركائها، ويحظر نسخها أو استخدامها دون إذن رسمي مسبق."],
+        ["استخدام الموقع", "المحتوى المنشور في الموقع مخصص للتعريف بخدمات وحلول شركة تكنولوجيا الخبر. تفاصيل المشاريع ونطاق العمل والاتفاقيات ملزمة فقط عبر العقود الرسمية الموقعة."],
+        ["الملكية الفكرية", "جميع المحتويات والعلامات التجارية والنصوص والتصميمات المنشورة ملك لشركة تكنولوجيا الخبر وشركائها، ويحظر نسخها أو استخدامها دون إذن رسمي مسبق."],
         ["الاستفسارات ونماذج الطلب", "إرسال نموذج طلب استشارة أو اجتماع يتيح لفريقنا الهندسي التواصل معك ولا يشكل التزاماً تعاقدياً بالبدء حتى اكتمال دراسة المتطلبات وتوقيع العقد."],
         ["القوانين المعمول بها", "تخضع هذه الشروط والأحكام وتفسر وفقاً للأنظمة واللوائح السارية في المملكة العربية السعودية."],
       ]
@@ -43,7 +43,7 @@ export default async function Terms({ params }: { params: Promise<{ locale: stri
           <p className="eyebrow">{ar ? "قانوني" : "Legal"}</p>
           <h1 className="heading mt-4 text-4xl sm:text-5xl">{ar ? "الشروط والأحكام" : "Terms & Conditions"}</h1>
           <p className="mt-4 text-sm text-slate-400">
-            {ar ? "ضوابط وشروط استخدام منصة تكنلوجيا الخبير." : "Terms governing the use of the Khobar Tech platform."}
+            {ar ? "ضوابط وشروط استخدام منصة تكنولوجيا الخبر." : "Terms governing the use of the Khobar Tech platform."}
           </p>
         </div>
 
@@ -59,3 +59,4 @@ export default async function Terms({ params }: { params: Promise<{ locale: stri
     </article>
   );
 }
+

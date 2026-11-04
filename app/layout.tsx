@@ -21,7 +21,7 @@ const latinFont = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   metadataBase: siteUrl ? new URL(siteUrl) : undefined,
   title: { default: siteName, template: `%s | ${siteName}` },
-  description: "تكنلوجيا الخبير للاستشارات والحلول التقنية المتكاملة: أنظمة ERP، الذكاء الاصطناعي، الأمن السيبراني، والتطبيقات السحابية.",
+  description: "تكنولوجيا الخبر للاستشارات والحلول التقنية المتكاملة: أنظمة ERP، الذكاء الاصطناعي، الأمن السيبراني، والتطبيقات السحابية.",
   robots: { index: true, follow: true },
 };
 

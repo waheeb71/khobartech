@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpLeft, Check, MoveUpLeft, ArrowRight, ArrowLeft } from "lucide-react";
 import { AssetPlaceholder } from "@/components/AssetPlaceholder";
@@ -21,7 +21,7 @@ export async function generateMetadata({
   return pageMetadata({
     locale,
     path: `/services/${category}`,
-    title: `${group.title[locale]} | تكنلوجيا الخبير`,
+    title: `${group.title[locale]} | تكنولوجيا الخبر`,
     description: group.description[locale],
   });
 }
@@ -186,3 +186,4 @@ export default async function CategoryPage({
     </>
   );
 }
+

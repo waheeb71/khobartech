@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpLeft, ArrowRight, ArrowLeft } from "lucide-react";
 import { PhotoFrame } from "@/components/PhotoFrame";
@@ -26,7 +26,7 @@ export async function generateMetadata({
   return pageMetadata({
     locale,
     path: `/products/${slug}`,
-    title: `${locale === "ar" ? product.seoTitleAr || product.titleAr : product.seoTitleEn || product.titleEn} | تكنلوجيا الخبير`,
+    title: `${locale === "ar" ? product.seoTitleAr || product.titleAr : product.seoTitleEn || product.titleEn} | تكنولوجيا الخبر`,
     description:
       locale === "ar"
         ? product.seoDescriptionAr || product.excerptAr || product.titleAr
@@ -84,3 +84,4 @@ export default async function ProductDetail({
     </article>
   );
 }
+

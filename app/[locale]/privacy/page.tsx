@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import type { Locale } from "@/lib/catalog";
 import { isLocale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/seo";
@@ -10,10 +10,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({
     locale,
     path: "/privacy",
-    title: locale === "ar" ? "سياسة الخصوصية | تكنلوجيا الخبير" : "Privacy Policy | Khobar Tech",
+    title: locale === "ar" ? "سياسة الخصوصية | تكنولوجيا الخبر" : "Privacy Policy | Khobar Tech",
     description:
       locale === "ar"
-        ? "سياسة الخصوصية وحماية البيانات في شركة تكنلوجيا الخبير."
+        ? "سياسة الخصوصية وحماية البيانات في شركة تكنولوجيا الخبر."
         : "Privacy policy and data protection at Khobar Tech.",
   });
 }
@@ -24,7 +24,7 @@ export default async function Privacy({ params }: { params: Promise<{ locale: st
   const ar = locale === "ar";
   const sections = ar
     ? [
-        ["الغرض", "توضح هذه الصفحة كيفية تعامل شركة تكنلوجيا الخبير مع البيانات التي يرسلها زوار الموقع، بما في ذلك نماذج الاستفسار وطلبات الاجتماع."],
+        ["الغرض", "توضح هذه الصفحة كيفية تعامل شركة تكنولوجيا الخبر مع البيانات التي يرسلها زوار الموقع، بما في ذلك نماذج الاستفسار وطلبات الاجتماع."],
         ["البيانات التي نجمعها", "نجمع فقط البيانات التي تقدمها طوعاً مثل الاسم والبريد الإلكتروني ورقم الهاتف وبيانات المشروع، لاستخدامها في الرد على استفسارك ومتابعة متطلباتك التقنية."],
         ["الحماية والاحتفاظ", "نقيّد الوصول إلى البيانات للمختصين المخولين فقط مع تطبيق أعلى معايير التشفير والأمان السيبراني، ولا نشارك أو نبيع بيانات التواصل مع أي طرف ثالث."],
         ["التحديثات والتواصل", "تُحدث هذه السياسة لمواكبة الأنظمة المحلية وحماية البيانات الشخصية في المملكة العربية السعودية، ويمكنك التواصل معنا دائماً لأي استفسار."],
@@ -59,3 +59,4 @@ export default async function Privacy({ params }: { params: Promise<{ locale: st
     </article>
   );
 }
+

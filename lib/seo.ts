@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { Locale } from "@/lib/catalog";
 
-export const siteName = "تكنلوجيا الخبير | Khobar Tech";
+export const siteName = "تكنولوجيا الخبر | Khobar Tech";
 export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
 
 export function absoluteUrl(path: string) {
@@ -24,10 +24,10 @@ export function organizationJsonLd(locale: Locale) {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: siteName,
-    alternateName: locale === "ar" ? "نجاح كود" : "Najah Code",
+    alternateName: locale === "ar" ? "تكنولوجيا الخبر" : "Khobar Tech",
     url: siteUrl,
-    description: locale === "ar" ? "شركة تقنية تبني حلولاً برمجية ومنتجات رقمية للأعمال." : "A technology company building software solutions and digital products for businesses.",
-    logo: absoluteUrl("/images/brand/logo-mark-primary.svg"),
+    description: locale === "ar" ? "شركة تقنية سعودية متخصصة في الحلول البرمجية المؤسسية والأنظمة السحابية والذكاء الاصطناعي والأمن السيبراني." : "A premier Saudi technology company specializing in enterprise software, cloud systems, AI solutions, and cybersecurity.",
+    logo: absoluteUrl("/logo-dark.png"),
     sameAs: [],
   };
 }

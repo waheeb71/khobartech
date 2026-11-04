@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpLeft, Check, MoveUpRight, ArrowRight, ArrowLeft } from "lucide-react";
 import { AssetPlaceholder } from "@/components/AssetPlaceholder";
@@ -38,7 +38,7 @@ export async function generateMetadata({
   return pageMetadata({
     locale,
     path: `/services/${category}/${slug}`,
-    title: `${title} | تكنلوجيا الخبير`,
+    title: `${title} | تكنولوجيا الخبر`,
     description,
   });
 }
@@ -211,7 +211,7 @@ export default async function ServicePage({
               {l === "ar" ? "استشارة مجانية" : "Free Consultation"}
             </p>
             <h2>{l === "ar" ? "هل ترغب بمناقشة تطبيق هذه الخدمة لمؤسستك؟" : "Ready to discuss this solution for your business?"}</h2>
-            <p>{l === "ar" ? "فريق تكنلوجيا الخبير متواجد للإجابة على جميع الاستفسارات وتقديم خطة مقترحة." : "Khobar Tech engineers are ready to answer your questions and draft a proposed plan."}</p>
+            <p>{l === "ar" ? "فريق تكنولوجيا الخبر متواجد للإجابة على جميع الاستفسارات وتقديم خطة مقترحة." : "Khobar Tech engineers are ready to answer your questions and draft a proposed plan."}</p>
           </div>
           <Link className="btn-primary" href={localeHref(l, "/contact")}>
             {t.nav.start}
@@ -222,3 +222,4 @@ export default async function ServicePage({
     </>
   );
 }
+

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Mail, MessageCircle, Phone, MapPin, Clock } from "lucide-react";
 import { ContactForm } from "@/components/ContactForm";
 import { JsonLd } from "@/components/JsonLd";
@@ -17,10 +17,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({
     locale,
     path: "/contact",
-    title: locale === "ar" ? "تواصل معنا | تكنلوجيا الخبير" : "Contact Us | Khobar Tech",
+    title: locale === "ar" ? "تواصل معنا | تكنولوجيا الخبر" : "Contact Us | Khobar Tech",
     description:
       locale === "ar"
-        ? "تواصل مع خبراء تكنلوجيا الخبير لمناقشة مشروعك التقني وحلول الأعمال والذكاء الاصطناعي والأمن السيبراني."
+        ? "تواصل مع خبراء تكنولوجيا الخبر لمناقشة مشروعك التقني وحلول الأعمال والذكاء الاصطناعي والأمن السيبراني."
         : "Contact Khobar Tech experts to discuss your technology project, enterprise systems, AI solutions, and cybersecurity.",
   });
 }
@@ -52,7 +52,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
         <div className="page-hero-bg">
           <PhotoFrame
             src="/hero.jpg"
-            alt={l === "ar" ? "خلفية التواصل مع تكنلوجيا الخبير" : "Contact Khobar Tech background"}
+            alt={l === "ar" ? "خلفية التواصل مع تكنولوجيا الخبر" : "Contact Khobar Tech background"}
             className="absolute inset-0 h-full w-full"
             priority
             sizes="100vw"
@@ -67,7 +67,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
           </h1>
           <p className="lede mt-5 max-w-2xl text-slate-300">
             {l === "ar"
-              ? "سواء كنت تخطط لنظام ERP متكامل، تطبيق سحابي، أو استشارة ذكاء اصطناعي، فريق تكنلوجيا الخبير جاهز لمساعدتك."
+              ? "سواء كنت تخطط لنظام ERP متكامل، تطبيق سحابي، أو استشارة ذكاء اصطناعي، فريق تكنولوجيا الخبر جاهز لمساعدتك."
               : "Whether you need a full ERP implementation, cloud platform, or AI consulting, the Khobar Tech team is ready."}
           </p>
         </div>
@@ -115,7 +115,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
             <div className="reveal-scale">
               <PhotoFrame
                 src="/images/redesign/development-collaboration.webp"
-                alt={l === "ar" ? "فريق تكنلوجيا الخبير يراجع متطلبات المشاريع" : "Khobar Tech team discussing projects"}
+                alt={l === "ar" ? "فريق تكنولوجيا الخبر يراجع متطلبات المشاريع" : "Khobar Tech team discussing projects"}
                 className="aspect-[16/10] rounded-2xl border border-white/10"
                 sizes="(min-width: 1024px) 36vw, 100vw"
               />
@@ -145,3 +145,4 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
     </>
   );
 }
+

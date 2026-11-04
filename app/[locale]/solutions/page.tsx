@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpLeft, Layers, CheckCircle2 } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
@@ -15,10 +15,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({
     locale,
     path: "/solutions",
-    title: locale === "ar" ? "حلول الأعمال التقنية | تكنلوجيا الخبير" : "Business Technology Solutions | Khobar Tech",
+    title: locale === "ar" ? "حلول الأعمال التقنية | تكنولوجيا الخبر" : "Business Technology Solutions | Khobar Tech",
     description:
       locale === "ar"
-        ? "حلول تكنلوجيا الخبير المتكاملة لإدارة العمليات، المحاسبة والمالية، الموارد البشرية، خدمة العملاء، وسلاسل الإمداد."
+        ? "حلول تكنولوجيا الخبر المتكاملة لإدارة العمليات، المحاسبة والمالية، الموارد البشرية، خدمة العملاء، وسلاسل الإمداد."
         : "Khobar Tech integrated solutions for operations, accounting, finance, HR, CRM, and supply chain management.",
   });
 }
@@ -38,7 +38,7 @@ export default async function SolutionsPage({ params }: { params: Promise<{ loca
         <div className="page-hero-bg">
           <PhotoFrame
             src="/hero.jpg"
-            alt={l === "ar" ? "خلفية حلول تكنلوجيا الخبير" : "Khobar Tech solutions background"}
+            alt={l === "ar" ? "خلفية حلول تكنولوجيا الخبر" : "Khobar Tech solutions background"}
             className="absolute inset-0 h-full w-full"
             priority
             sizes="100vw"
@@ -133,3 +133,4 @@ export default async function SolutionsPage({ params }: { params: Promise<{ loca
     </>
   );
 }
+

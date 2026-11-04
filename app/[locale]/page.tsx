@@ -9,6 +9,9 @@ import { pageMetadata, organizationJsonLd } from "@/lib/seo";
 import { getSetting } from "@/lib/db";
 import { PhotoFrame } from "@/components/PhotoFrame";
 import { JsonLd } from "@/components/JsonLd";
+import { TechPartners } from "@/components/TechPartners";
+import { SectorsGrid } from "@/components/SectorsGrid";
+import { CaseStudiesSection } from "@/components/CaseStudiesSection";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({
@@ -23,10 +26,10 @@ export async function generateMetadata({
     locale,
     path: "",
     title: ar
-      ? "حلول تقنية تناسب طريقة عمل مؤسستك | تكنلوجيا الخبير"
+      ? "حلول تقنية تناسب طريقة عمل مؤسستك | تكنولوجيا الخبر"
       : "Technology Solutions That Fit How Your Business Works | Khobar Tech",
     description: ar
-      ? "تكنلوجيا الخبير شركة تقنية تبني أنظمة مؤسسية وتطبيقات وحلول ذكاء اصطناعي وأمن سيبراني للشركات في المملكة العربية السعودية."
+      ? "تكنولوجيا الخبر شركة تقنية تبني أنظمة مؤسسية وتطبيقات وحلول ذكاء اصطناعي وأمن سيبراني للشركات في المملكة العربية السعودية."
       : "Khobar Tech builds enterprise systems, applications, AI solutions, and cybersecurity for businesses in Saudi Arabia.",
   });
 }
@@ -181,6 +184,11 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+
+      {/* ============================
+          TECH ECOSYSTEM & COMPLIANCE
+      ============================*/}
+      <TechPartners locale={l} />
 
       {/* ============================
           QUOTE (MBS)
@@ -362,7 +370,7 @@ export default async function HomePage({
               className="principle-chips"
               aria-label={
                 l === "ar"
-                  ? "مبادئ تكنلوجيا الخبير"
+                  ? "مبادئ تكنولوجيا الخبر"
                   : "Khobar Tech principles"
               }
             >
@@ -408,7 +416,7 @@ export default async function HomePage({
           <div className="product-feature reveal">
             <div className="product-feature-copy">
               <p className="eyebrow">
-                {l === "ar" ? "منتجات تكنلوجيا الخبير" : "Khobar Tech products"}
+                {l === "ar" ? "منتجات تكنولوجيا الخبر" : "Khobar Tech products"}
               </p>
               <h2 id="products-title">{t.sections.products}</h2>
               <p>{t.sections.productsLead}</p>
@@ -517,3 +525,4 @@ export default async function HomePage({
     </>
   );
 }
+

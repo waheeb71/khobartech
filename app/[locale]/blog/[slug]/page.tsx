@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpLeft, Calendar, User, ArrowRight, ArrowLeft } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   if (!post || post.type !== "post") return {};
   const title = locale === "ar" ? post.seoTitleAr || post.titleAr : post.seoTitleEn || post.titleEn;
   const description = locale === "ar" ? post.seoDescriptionAr || post.excerptAr || post.titleAr : post.seoDescriptionEn || post.excerptEn || post.titleEn;
-  return pageMetadata({ locale, path: `/blog/${slug}`, title: `${title} | تكنلوجيا الخبير`, description });
+  return pageMetadata({ locale, path: `/blog/${slug}`, title: `${title} | تكنولوجيا الخبر`, description });
 }
 
 export default async function BlogPost({ params }: { params: Promise<{ locale: string; slug: string }> }) {
@@ -44,8 +44,8 @@ export default async function BlogPost({ params }: { params: Promise<{ locale: s
           description,
           image: image.src,
           inLanguage: l,
-          author: { "@type": "Organization", name: "تكنلوجيا الخبير" },
-          publisher: { "@type": "Organization", name: "تكنلوجيا الخبير" },
+          author: { "@type": "Organization", name: "تكنولوجيا الخبر" },
+          publisher: { "@type": "Organization", name: "تكنولوجيا الخبر" },
         }}
       />
 
@@ -110,3 +110,4 @@ export default async function BlogPost({ params }: { params: Promise<{ locale: s
     </>
   );
 }
+

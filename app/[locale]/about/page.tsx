@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpLeft, ShieldCheck, Zap, Users, Target } from "lucide-react";
 import { PhotoFrame } from "@/components/PhotoFrame";
@@ -14,10 +14,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({
     locale,
     path: "/about",
-    title: locale === "ar" ? "عن تكنلوجيا الخبير | شركاؤك في التحول الرقمي" : "About Khobar Tech | Digital Transformation Partners",
+    title: locale === "ar" ? "عن تكنولوجيا الخبر | شركاؤك في التحول الرقمي" : "About Khobar Tech | Digital Transformation Partners",
     description:
       locale === "ar"
-        ? "تعرف على تكنلوجيا الخبير: بيت خبرة تقني سعودي متخصص في تطوير وتكامل الأنظمة المؤسسية وحلول الذكاء الاصطناعي والأمن السيبراني."
+        ? "تعرف على تكنولوجيا الخبر: بيت خبرة تقني سعودي متخصص في تطوير وتكامل الأنظمة المؤسسية وحلول الذكاء الاصطناعي والأمن السيبراني."
         : "Learn about Khobar Tech: A Saudi technology powerhouse specialized in enterprise systems, AI solutions, and cybersecurity.",
   });
 }
@@ -65,7 +65,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         <div className="page-hero-bg">
           <PhotoFrame
             src="/hero.jpg"
-            alt={l === "ar" ? "خلفية عن تكنلوجيا الخبير" : "About Khobar Tech background"}
+            alt={l === "ar" ? "خلفية عن تكنولوجيا الخبر" : "About Khobar Tech background"}
             className="absolute inset-0 h-full w-full"
             priority
             sizes="100vw"
@@ -74,7 +74,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </div>
         <div className="hero-bg-glow" />
         <div className="shell relative z-10 reveal">
-          <p className="eyebrow">{l === "ar" ? "عن تكنلوجيا الخبير" : "About Khobar Tech"}</p>
+          <p className="eyebrow">{l === "ar" ? "عن تكنولوجيا الخبر" : "About Khobar Tech"}</p>
           <h1 className="heading mt-4 text-4xl sm:text-6xl max-w-4xl">
             {l === "ar"
               ? "نبتكر الحلول التقنية التي تمكّن المؤسسات وتدعم مسيرتها."
@@ -82,7 +82,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           </h1>
           <p className="lede mt-6 max-w-3xl text-slate-300">
             {l === "ar"
-              ? "تكنلوجيا الخبير هي شركة استشارات وحلول تقنية متخصصة في المملكة العربية السعودية. نجمع بين الخبرة العميقة في أنظمة ERP، الذكاء الاصطناعي، الأمن السيبراني، والتطوير البرمجي لتقديم بيئات عمل رقمية موحدة وعالية الكفاءة."
+              ? "تكنولوجيا الخبر هي شركة استشارات وحلول تقنية متخصصة في المملكة العربية السعودية. نجمع بين الخبرة العميقة في أنظمة ERP، الذكاء الاصطناعي، الأمن السيبراني، والتطوير البرمجي لتقديم بيئات عمل رقمية موحدة وعالية الكفاءة."
               : "Khobar Tech is a specialized technology consulting and solutions company in Saudi Arabia. We combine deep expertise in ERP, AI, cybersecurity, and software engineering to deliver unified, high-performing digital environments."}
           </p>
         </div>
@@ -102,7 +102,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             </h2>
             <p className="mt-5 text-base leading-8 text-slate-300">
               {l === "ar"
-                ? "تعتمد المؤسسات الحديثة على منظومة معقدة من البيانات، العمليات، والتطبيقات. مهمتنا في تكنلوجيا الخبير هي فك هذا التعقيد وربط هذه المكونات في منصة سلسة ومترابطة تعزز اتخاذ القرار وتضاعف الإنتاجية."
+                ? "تعتمد المؤسسات الحديثة على منظومة معقدة من البيانات، العمليات، والتطبيقات. مهمتنا في تكنولوجيا الخبر هي فك هذا التعقيد وربط هذه المكونات في منصة سلسة ومترابطة تعزز اتخاذ القرار وتضاعف الإنتاجية."
                 : "Modern enterprises rely on a complex ecosystem of data, workflows, and applications. At Khobar Tech, our mission is to simplify this complexity and unify these parts into a seamless, high-yield digital platform."}
             </p>
             <div className="mt-8 grid grid-cols-2 gap-4 border-t border-white/10 pt-6 reveal-stagger">
@@ -119,7 +119,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             <div className="absolute -inset-2 bg-gradient-to-r from-cyan/20 to-blue/20 rounded-3xl blur-xl" />
             <PhotoFrame
               src="/images/redesign/hero-team.webp"
-              alt={l === "ar" ? "فريق عمل تكنلوجيا الخبير" : "Khobar Tech engineering team"}
+              alt={l === "ar" ? "فريق عمل تكنولوجيا الخبر" : "Khobar Tech engineering team"}
               className="relative aspect-[4/3] rounded-2xl border border-white/10 shadow-2xl"
               sizes="(min-width: 1024px) 45vw, 100vw"
               priority
@@ -175,3 +175,4 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
     </>
   );
 }
+

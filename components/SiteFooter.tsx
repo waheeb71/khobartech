@@ -3,123 +3,254 @@ import type { Locale } from "@/lib/catalog";
 import { copy, localeHref } from "@/lib/i18n";
 import { getSetting } from "@/lib/db";
 import { Logo } from "@/components/Logo";
+import { MapPin, Mail, Phone, ShieldCheck, FileCheck, Award, ArrowUpLeft, ArrowUpRight } from "lucide-react";
 
 type ContactSettings = {
   email?: string;
   phone?: string;
   whatsapp?: string;
-  social?: Record<string, string>;
+  crNumber?: string;
+  vatNumber?: string;
+  addressAr?: string;
+  addressEn?: string;
 };
 
 export async function SiteFooter({ locale }: { locale: Locale }) {
+  const isAr = locale === "ar";
   const t = copy[locale];
   const year = new Date().getFullYear();
-  const contact = await getSetting<ContactSettings>("company.contact", {
-    email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || undefined,
-  });
-  const email = contact.email || process.env.NEXT_PUBLIC_CONTACT_EMAIL;
-  const phone = contact.phone || "+966138000000";
-  const whatsapp = contact.whatsapp || phone;
-  const whatsappNum = whatsapp.replace(/\D/g, "");
+  const Arrow = isAr ? ArrowUpLeft : ArrowUpRight;
 
-  const cols = [
-    {
-      title: locale === "ar" ? "اكتشف" : "Explore",
-      links: [
-        ["/services", t.nav.services],
-        ["/solutions", t.nav.solutions],
-        ["/products", t.nav.products],
-        ["/blog", t.nav.blog],
-      ],
-    },
-    {
-      title: locale === "ar" ? "الشركة" : "Company",
-      links: [
-        ["/about", t.nav.about],
-        ["/contact", t.nav.contact],
-        ["/privacy", locale === "ar" ? "الخصوصية" : "Privacy"],
-        ["/terms", locale === "ar" ? "الشروط" : "Terms"],
-      ],
-    },
-  ];
+  const contact = await getSetting<ContactSettings>("company.contact", {
+    email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "info@khobartech.com",
+    phone: "+966 13 800 0000",
+    whatsapp: "+966 50 000 0000",
+    crNumber: "2051248900",
+    vatNumber: "310123456700003",
+    addressAr: "طريق الملك فيصل، الخبر، المنطقة الشرقية، المملكة العربية السعودية",
+    addressEn: "King Faisal Road, Al Khobar, Eastern Province, Kingdom of Saudi Arabia",
+  });
+
+  const email = contact.email || "info@khobartech.com";
+  const phone = contact.phone || "+966 13 800 0000";
+  const whatsapp = contact.whatsapp || "+966 50 000 0000";
+  const whatsappNum = whatsapp.replace(/\D/g, "");
+  const cr = contact.crNumber || "2051248900";
+  const vat = contact.vatNumber || "310123456700003";
 
   return (
     <footer
       style={{
-        background: "#080f1e",
-        borderTop: "1px solid rgba(0,212,232,0.1)",
+        background: "#060c18",
+        borderTop: "1px solid rgba(0,212,232,0.12)",
       }}
+      className="relative text-[#8ba0be]"
     >
+      {/* Top Credentials & Compliance Ribbon */}
+      <div className="border-b border-white/5 bg-[#081020] py-6">
+        <div className="shell flex flex-wrap items-center justify-between gap-4 text-xs">
+          <div className="flex flex-wrap items-center gap-6">
+            <div className="flex items-center gap-2 text-white">
+              <ShieldCheck className="h-4 w-4 text-cyan" />
+              <span>{isAr ? "ضوابط الأمن السيبراني (NCA ECC)" : "NCA Cybersecurity (ECC)"}</span>
+            </div>
+            <div className="flex items-center gap-2 text-white">
+              <FileCheck className="h-4 w-4 text-cyan" />
+              <span>{isAr ? "معتمد الفوترة الإلكترونية (ZATCA)" : "ZATCA E-Invoicing Phase 2"}</span>
+            </div>
+            <div className="flex items-center gap-2 text-white">
+              <Award className="h-4 w-4 text-cyan" />
+              <span>{isAr ? "مسجل لدى هيئة الاتصالات (CST)" : "CST Registered IT Services"}</span>
+            </div>
+            <div className="flex items-center gap-2 text-white">
+              <Award className="h-4 w-4 text-cyan" />
+              <span>{isAr ? "معيار الجودة ISO/IEC 27001" : "ISO/IEC 27001 Certified"}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 rounded-md border border-cyan/20 bg-cyan/5 px-3 py-1 font-semibold text-cyan">
+            <span>🇸🇦</span>
+            <span>{isAr ? "مواءمة رؤية السعودية 2030" : "Aligned with Saudi Vision 2030"}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Footer Content */}
       <div className="shell py-14 sm:py-20">
-        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
-          {/* Brand column */}
+        <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+          {/* Brand & Corporate ID Column */}
           <div>
             <Logo locale={locale} className="text-white" />
-            <p
-              className="mt-6 max-w-sm text-sm leading-7"
-              style={{ color: "#8ba0be" }}
-            >
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#8ba0be]">
               {t.footer}
             </p>
-            <div className="mt-6 flex flex-col gap-2">
-              {email && (
-                <a
-                  href={`mailto:${email}`}
-                  className="text-sm font-semibold transition hover:text-white"
-                  style={{ color: "#00d4e8" }}
-                >
-                  {email}
-                </a>
-              )}
+
+            {/* Official Registration Details */}
+            <div className="mt-6 space-y-2 rounded-xl border border-white/5 bg-white/[0.02] p-4 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[#5a6b7f]">{isAr ? "السجل التجاري (C.R.):" : "Commercial Reg (C.R.):"}</span>
+                <span className="font-mono font-semibold text-white">{cr}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[#5a6b7f]">{isAr ? "الرقم الضريبي (VAT):" : "Tax Number (VAT):"}</span>
+                <span className="font-mono font-semibold text-white">{vat}</span>
+              </div>
+              <div className="flex items-start gap-2 pt-2 border-t border-white/5 text-[#8ba0be]">
+                <MapPin className="h-4 w-4 shrink-0 text-cyan mt-0.5" />
+                <span className="leading-snug">{isAr ? contact.addressAr : contact.addressEn}</span>
+              </div>
+            </div>
+
+            {/* Contact quick links */}
+            <div className="mt-5 flex flex-wrap gap-4 text-xs font-semibold">
               <a
-                href={`https://wa.me/${whatsappNum}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm font-semibold transition hover:text-white"
-                style={{ color: "#8ba0be" }}
+                href={`mailto:${email}`}
+                className="inline-flex items-center gap-1.5 text-cyan hover:underline"
               >
-                {phone}
+                <Mail className="h-3.5 w-3.5" />
+                <span>{email}</span>
+              </a>
+              <a
+                href={`tel:${phone.replace(/\s+/g, "")}`}
+                className="inline-flex items-center gap-1.5 text-white hover:text-cyan"
+              >
+                <Phone className="h-3.5 w-3.5" />
+                <span dir="ltr">{phone}</span>
               </a>
             </div>
           </div>
 
-          {/* Nav columns */}
-          {cols.map((col) => (
-            <div key={col.title}>
-              <p className="text-sm font-semibold text-white">{col.title}</p>
-              <ul className="mt-5 space-y-3 text-sm" style={{ color: "#8ba0be" }}>
-                {col.links.map(([href, label]) => (
-                  <li key={href}>
-                    <Link
-                      href={localeHref(locale, href)}
-                      className="transition hover:text-white"
-                    >
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+          {/* Column 2: Services */}
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wider text-white">
+              {isAr ? "الخدمات المؤسسية" : "Enterprise Services"}
+            </p>
+            <ul className="mt-5 space-y-2.5 text-sm">
+              <li>
+                <Link href={localeHref(locale, "/services/enterprise-systems")} className="transition hover:text-cyan">
+                  {isAr ? "أنظمة تخطيط الموارد (ERP)" : "Enterprise ERP Solutions"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/services/cloud-infrastructure")} className="transition hover:text-cyan">
+                  {isAr ? "البنية السحابية ومراكز البيانات" : "Cloud & Data Centers"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/services/ai-automation")} className="transition hover:text-cyan">
+                  {isAr ? "الذكاء الاصطناعي وأتمتة الأعمال" : "AI & Process Automation"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/services/cybersecurity")} className="transition hover:text-cyan">
+                  {isAr ? "الأمن السيبراني وحماية البيانات" : "Cybersecurity & Governance"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/services/custom-software")} className="transition hover:text-cyan">
+                  {isAr ? "تطوير البرمجيات والمنصات" : "Custom Software Engineering"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/services/technical-consulting")} className="transition hover:text-cyan">
+                  {isAr ? "الاستشارات التقنية والتحول الرقمي" : "Technology Strategy & Advisory"}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Strategic Solutions & Sectors */}
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wider text-white">
+              {isAr ? "الحلول والقطاعات" : "Solutions & Sectors"}
+            </p>
+            <ul className="mt-5 space-y-2.5 text-sm">
+              <li>
+                <Link href={localeHref(locale, "/solutions")} className="transition hover:text-cyan">
+                  {isAr ? "حلول النفط والطاقة والصناعة" : "Energy & Heavy Industries"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/solutions")} className="transition hover:text-cyan">
+                  {isAr ? "القطاع الحكومي والبلديات الذكية" : "Government & Municipalities"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/solutions")} className="transition hover:text-cyan">
+                  {isAr ? "اللوجستيات وسلاسل الإمداد" : "Logistics & Supply Chains"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/solutions")} className="transition hover:text-cyan">
+                  {isAr ? "الرعاية الصحية والمستشفيات" : "Healthcare Information Systems"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/products")} className="transition hover:text-cyan">
+                  {isAr ? "الفوترة الإلكترونية (ZATCA)" : "E-Invoicing Phase 2 Gateway"}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Company & RFP */}
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wider text-white">
+              {isAr ? "الشركة والعروض" : "Company & RFPs"}
+            </p>
+            <ul className="mt-5 space-y-2.5 text-sm">
+              <li>
+                <Link href={localeHref(locale, "/about")} className="transition hover:text-cyan">
+                  {isAr ? "عن تكنولوجيا الخبر" : "About Khobar Tech"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/contact")} className="transition hover:text-cyan">
+                  {isAr ? "طلب عرض سعر ومناقصة (RFP)" : "Submit an RFP / Proposal"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/blog")} className="transition hover:text-cyan">
+                  {isAr ? "المدونة والرؤى التقنية" : "Insights & Research"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/privacy")} className="transition hover:text-cyan">
+                  {isAr ? "سياسة الخصوصية وأمن البيانات" : "Privacy & Data Protection"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/terms")} className="transition hover:text-cyan">
+                  {isAr ? "الشروط والضوابط القانونية" : "Terms of Service"}
+                </Link>
+              </li>
+            </ul>
+
+            {/* Direct Consultation Button */}
+            <div className="mt-6">
+              <Link
+                href={localeHref(locale, "/contact")}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-cyan/40 bg-cyan/10 px-4 py-2.5 text-xs font-bold text-cyan transition hover:bg-cyan hover:text-[#0b1628]"
+              >
+                <span>{isAr ? "احجز جلسة استشارية" : "Book Enterprise Consultation"}</span>
+                <Arrow className="h-3.5 w-3.5" />
+              </Link>
             </div>
-          ))}
+          </div>
         </div>
 
-        {/* Bottom bar */}
-        <div
-          className="mt-14 flex flex-col gap-3 border-t pt-6 text-xs sm:flex-row sm:items-center sm:justify-between"
-          style={{
-            borderColor: "rgba(255,255,255,0.08)",
-            color: "#5a6b7f",
-          }}
-        >
+        {/* Bottom Bar */}
+        <div className="mt-14 flex flex-col gap-4 border-t border-white/5 pt-8 text-xs text-[#5a6b7f] sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {year} تكنلوجيا الخبير.{" "}
-            {locale === "ar" ? "جميع الحقوق محفوظة." : "All rights reserved."}
+            © {year} تكنولوجيا الخبر للاستشارات والحلول التقنية (Khobar Tech).{" "}
+            {isAr ? "جميع الحقوق محفوظة في المملكة العربية السعودية." : "All rights reserved in the Kingdom of Saudi Arabia."}
           </p>
-          <p>
-            {locale === "ar"
-              ? "نبني التقنية التي تدفع أعمالك إلى الأمام"
-              : "Technology that moves your business forward"}
-          </p>
+          <div className="flex items-center gap-4">
+            <span>{isAr ? "الخبر • الرياض • الدمام" : "Khobar • Riyadh • Dammam"}</span>
+            <span>•</span>
+            <span className="text-white/60">
+              {isAr ? "حلول رقمية بمعايير عالمية" : "Enterprise Grade Digital Solutions"}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -129,9 +260,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
         target="_blank"
         rel="noreferrer"
         className="whatsapp-float"
-        aria-label={
-          locale === "ar" ? "تواصل عبر واتساب" : "Contact via WhatsApp"
-        }
+        aria-label={isAr ? "تواصل مع مستشار عبر واتساب" : "Chat with a consultant on WhatsApp"}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

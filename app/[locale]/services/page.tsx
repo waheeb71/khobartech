@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpLeft, MoveUpLeft, CheckCircle2 } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
@@ -16,10 +16,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({
     locale,
     path: "/services",
-    title: locale === "ar" ? "خدماتنا التقنية المتكاملة | تكنلوجيا الخبير" : "Integrated Tech Services | Khobar Tech",
+    title: locale === "ar" ? "خدماتنا التقنية المتكاملة | تكنولوجيا الخبر" : "Integrated Tech Services | Khobar Tech",
     description:
       locale === "ar"
-        ? "استعرض خدمات تكنلوجيا الخبير في حلول تخطيط موارد المؤسسات ERP، أودو، الذكاء الاصطناعي، الأمن السيبراني، وتطوير التطبيقات السحابية."
+        ? "استعرض خدمات تكنولوجيا الخبر في حلول تخطيط موارد المؤسسات ERP، أودو، الذكاء الاصطناعي، الأمن السيبراني، وتطوير التطبيقات السحابية."
         : "Explore Khobar Tech services in ERP systems, Odoo, AI & automation, cybersecurity, cloud platforms, and custom software.",
   });
 }
@@ -39,7 +39,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
         <div className="page-hero-bg">
           <PhotoFrame
             src="/hero.jpg"
-            alt={l === "ar" ? "أفق الرياض الذكي وحلول تكنلوجيا الخبير" : "Khobar Tech smart solutions background"}
+            alt={l === "ar" ? "أفق الرياض الذكي وحلول تكنولوجيا الخبر" : "Khobar Tech smart solutions background"}
             className="absolute inset-0 h-full w-full"
             priority
             sizes="100vw"
@@ -144,3 +144,4 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
     </>
   );
 }
+

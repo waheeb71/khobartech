@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpLeft, Plus, Cpu, ArrowRight } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
@@ -15,10 +15,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return pageMetadata({
     locale,
     path: "/products",
-    title: locale === "ar" ? "منتجاتنا الرقمية والمنصات | تكنلوجيا الخبير" : "Digital Products & Platforms | Khobar Tech",
+    title: locale === "ar" ? "منتجاتنا الرقمية والمنصات | تكنولوجيا الخبر" : "Digital Products & Platforms | Khobar Tech",
     description:
       locale === "ar"
-        ? "استعرض منتجات ومنصات تكنلوجيا الخبير السحابية المصممة لقطاعات الأعمال في المملكة العربية السعودية."
+        ? "استعرض منتجات ومنصات تكنولوجيا الخبر السحابية المصممة لقطاعات الأعمال في المملكة العربية السعودية."
         : "Explore Khobar Tech cloud products and SaaS platforms tailored for Saudi businesses.",
   });
 }
@@ -45,7 +45,7 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
         <div className="page-hero-bg">
           <PhotoFrame
             src="/hero.jpg"
-            alt={l === "ar" ? "خلفية منتجات تكنلوجيا الخبير" : "Khobar Tech products background"}
+            alt={l === "ar" ? "خلفية منتجات تكنولوجيا الخبر" : "Khobar Tech products background"}
             className="absolute inset-0 h-full w-full"
             priority
             sizes="100vw"
@@ -172,3 +172,4 @@ export default async function ProductsPage({ params }: { params: Promise<{ local
     </>
   );
 }
+
