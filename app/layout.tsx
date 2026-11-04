@@ -23,6 +23,14 @@ export const metadata: Metadata = {
   title: { default: siteName, template: `%s | ${siteName}` },
   description: "تكنولوجيا الخبر للاستشارات والحلول التقنية المتكاملة: أنظمة ERP، الذكاء الاصطناعي، الأمن السيبراني، والتطبيقات السحابية.",
   robots: { index: true, follow: true },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icon-512.png", sizes: "512x512", type: "image/png" }],
+  },
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
