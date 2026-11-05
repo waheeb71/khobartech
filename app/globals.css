@@ -918,3 +918,77 @@ html[dir="rtl"] .hero-visual {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* =======================================
+   INFINITE MARQUEE TICKER (2 ROWS)
+   Row 1: Scrolling Right
+   Row 2: Scrolling Left
+   ======================================= */
+@keyframes marquee-scroll-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes marquee-scroll-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+}
+
+.marquee-track-right {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll-right 34s linear infinite;
+  will-change: transform;
+}
+
+.marquee-track-left {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll-left 34s linear infinite;
+  will-change: transform;
+}
+
+.marquee-track-right:hover,
+.marquee-track-left:hover {
+  animation-play-state: paused;
+}
+
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 2rem;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, filter 0.25s ease;
+  opacity: 0.9;
+}
+
+.marquee-item:hover {
+  transform: scale(1.15);
+  opacity: 1;
+  filter: drop-shadow(0 6px 20px rgba(0, 212, 232, 0.3));
+}
