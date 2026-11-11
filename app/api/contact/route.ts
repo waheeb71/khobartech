@@ -11,8 +11,8 @@ const schema = z.object({
   phone: z.string().trim().max(50).optional().or(z.literal("")),
   service: z.string().trim().min(2).max(191),
   budget: z.string().trim().max(100).optional().or(z.literal("")),
-  description: z.string().trim().min(20).max(5000),
-  locale: z.enum(["ar", "en"]),
+  description: z.string().trim().min(10).max(5000),
+  locale: z.enum(["ar", "en"]).default("ar"),
   website: z.string().max(0).optional(),
 });
 
@@ -51,9 +51,12 @@ export async function POST(request: Request) {
       budget: body.budget || null,
       description: body.description,
       locale: body.locale,
+      status: "new",
     });
+
     return NextResponse.json({ ok: true }, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("Inquiry submission error:", error);
     return NextResponse.json({ error: "Invalid inquiry." }, { status: 400 });
   }
 }

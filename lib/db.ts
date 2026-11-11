@@ -1,29 +1,37 @@
-import { drizzle } from "drizzle-orm/mysql2";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 import { and, asc, desc, eq } from "drizzle-orm";
-import mysql from "mysql2/promise";
-import { auditLogs, contactInquiries, contentItems, siteSettings } from "@/drizzle/schema";
+import { auditLogs, contactInquiries, contentItems, siteSettings, users } from "@/drizzle/schema";
 import { readLocalStore } from "@/lib/local-store";
 
 const url = process.env.DATABASE_URL || process.env.DRIZZLE_DATABASE_URL;
-const pool = url ? mysql.createPool({ uri: url, connectionLimit: 5, enableKeepAlive: true }) : null;
-export const db = pool ? drizzle(pool) : null;
+const sqlClient = url ? neon(url) : null;
+export const db = sqlClient ? drizzle(sqlClient) : null;
 
 export async function closeDatabase() {
-  await pool?.end();
+  // neon-http is stateless HTTP; no pool to terminate
 }
 
-export async function getPublishedContent(type: "service" | "product" | "page" | "post") {
+export async function getPublishedContent(type: "service" | "product" | "page" | "post" | "solution" | "portfolio") {
   if (!db) {
     const store = readLocalStore();
     return store.items
       .filter((item) => item.type === type && item.status === "published")
       .sort((a, b) => a.displayOrder - b.displayOrder);
   }
-  return db
-    .select()
-    .from(contentItems)
-    .where(and(eq(contentItems.type, type), eq(contentItems.status, "published")))
-    .orderBy(asc(contentItems.displayOrder));
+  try {
+    return await db
+      .select()
+      .from(contentItems)
+      .where(and(eq(contentItems.type, type), eq(contentItems.status, "published")))
+      .orderBy(asc(contentItems.displayOrder));
+  } catch (err) {
+    console.error("DB getPublishedContent error, falling back to local:", err);
+    const store = readLocalStore();
+    return store.items
+      .filter((item) => item.type === type && item.status === "published")
+      .sort((a, b) => a.displayOrder - b.displayOrder);
+  }
 }
 
 export async function getPublishedContentBySlug(slug: string) {
@@ -32,12 +40,19 @@ export async function getPublishedContentBySlug(slug: string) {
     const item = store.items.find((i) => i.slug === slug && i.status === "published");
     return item ?? null;
   }
-  const [item] = await db
-    .select()
-    .from(contentItems)
-    .where(and(eq(contentItems.slug, slug), eq(contentItems.status, "published")))
-    .limit(1);
-  return item ?? null;
+  try {
+    const [item] = await db
+      .select()
+      .from(contentItems)
+      .where(and(eq(contentItems.slug, slug), eq(contentItems.status, "published")))
+      .limit(1);
+    return item ?? null;
+  } catch (err) {
+    console.error("DB getPublishedContentBySlug error, falling back to local:", err);
+    const store = readLocalStore();
+    const item = store.items.find((i) => i.slug === slug && i.status === "published");
+    return item ?? null;
+  }
 }
 
 export async function getSetting<T>(key: string, fallback: T): Promise<T> {
@@ -46,8 +61,15 @@ export async function getSetting<T>(key: string, fallback: T): Promise<T> {
     const found = store.settings.find((s) => s.key === key);
     return (found?.value as T | undefined) ?? fallback;
   }
-  const [setting] = await db.select().from(siteSettings).where(eq(siteSettings.key, key)).limit(1);
-  return (setting?.value as T | undefined) ?? fallback;
+  try {
+    const [setting] = await db.select().from(siteSettings).where(eq(siteSettings.key, key)).limit(1);
+    return (setting?.value as T | undefined) ?? fallback;
+  } catch (err) {
+    console.error("DB getSetting error, falling back to local:", err);
+    const store = readLocalStore();
+    const found = store.settings.find((s) => s.key === key);
+    return (found?.value as T | undefined) ?? fallback;
+  }
 }
 
 export async function getAdminStudioData() {
@@ -58,13 +80,26 @@ export async function getAdminStudioData() {
       inquiries: store.inquiries,
       settings: store.settings,
       logs: store.logs,
+      isLiveDb: false,
     };
   }
-  const [items, inquiries, settings, logs] = await Promise.all([
-    db.select().from(contentItems).orderBy(desc(contentItems.updatedAt)).limit(50),
-    db.select().from(contactInquiries).orderBy(desc(contactInquiries.createdAt)).limit(50),
-    db.select().from(siteSettings).orderBy(desc(siteSettings.updatedAt)),
-    db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt)).limit(20),
-  ]);
-  return JSON.parse(JSON.stringify({ items, inquiries, settings, logs }));
+  try {
+    const [items, inquiries, settings, logs] = await Promise.all([
+      db.select().from(contentItems).orderBy(desc(contentItems.updatedAt)).limit(100),
+      db.select().from(contactInquiries).orderBy(desc(contactInquiries.createdAt)).limit(100),
+      db.select().from(siteSettings).orderBy(desc(siteSettings.updatedAt)),
+      db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt)).limit(50),
+    ]);
+    return JSON.parse(JSON.stringify({ items, inquiries, settings, logs, isLiveDb: true }));
+  } catch (err) {
+    console.error("DB getAdminStudioData error, falling back to local:", err);
+    const store = readLocalStore();
+    return {
+      items: store.items,
+      inquiries: store.inquiries,
+      settings: store.settings,
+      logs: store.logs,
+      isLiveDb: false,
+    };
+  }
 }

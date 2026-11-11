@@ -43,8 +43,8 @@ export default function AdminLoginPage() {
           <span className="grid h-12 w-12 place-items-center rounded-full bg-navy text-cyan">
             <ShieldCheck size={24} />
           </span>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-            Najah Code · Restricted Gate
+          <span className="text-[11px] font-bold uppercase tracking-wider text-cyan">
+            تكنولوجيا الخبر · بوابة الإدارة الآمنة
           </span>
         </div>
 

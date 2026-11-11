@@ -1,80 +1,106 @@
-import { int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import {
+  boolean,
+  integer,
+  jsonb,
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 
-export const users = mysqlTable("users", {
-  id: int("id").primaryKey().autoincrement(),
-  openId: varchar("open_id", { length: 191 }).notNull().unique(),
-  email: varchar("email", { length: 191 }).notNull().unique(),
-  name: varchar("name", { length: 191 }),
-  role: mysqlEnum("role", ["owner", "editor", "viewer"]).notNull().default("viewer"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+export const roleEnum = pgEnum("user_role", ["owner", "editor", "viewer"]);
+export const statusEnum = pgEnum("content_status", ["draft", "published", "archived"]);
+export const contentTypeEnum = pgEnum("content_type", [
+  "service",
+  "product",
+  "page",
+  "post",
+  "testimonial",
+  "portfolio",
+  "solution",
+]);
+export const inquiryStatusEnum = pgEnum("inquiry_status", [
+  "new",
+  "in_progress",
+  "contacted",
+  "closed",
+]);
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  openId: text("open_id").notNull().unique(),
+  email: text("email").notNull().unique(),
+  name: text("name"),
+  role: text("role").notNull().default("viewer"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-const status = mysqlEnum("status", ["draft", "published", "archived"]);
-
-export const contentItems = mysqlTable("content_items", {
-  id: int("id").primaryKey().autoincrement(),
-  type: mysqlEnum("type", ["service", "product", "page", "post", "testimonial", "portfolio"]).notNull(),
-  category: varchar("category", { length: 100 }),
-  slug: varchar("slug", { length: 191 }).notNull().unique(),
-  titleAr: varchar("title_ar", { length: 255 }).notNull(),
-  titleEn: varchar("title_en", { length: 255 }).notNull(),
+export const contentItems = pgTable("content_items", {
+  id: serial("id").primaryKey(),
+  type: text("type").notNull(), // 'service' | 'product' | 'page' | 'post' | 'solution' | 'portfolio'
+  category: text("category"),
+  slug: text("slug").notNull().unique(),
+  titleAr: text("title_ar").notNull(),
+  titleEn: text("title_en").notNull(),
   excerptAr: text("excerpt_ar"),
   excerptEn: text("excerpt_en"),
   bodyAr: text("body_ar"),
   bodyEn: text("body_en"),
-  imageKey: varchar("image_key", { length: 500 }),
-  seoTitleAr: varchar("seo_title_ar", { length: 255 }),
-  seoTitleEn: varchar("seo_title_en", { length: 255 }),
+  imageKey: text("image_key"),
+  seoTitleAr: text("seo_title_ar"),
+  seoTitleEn: text("seo_title_en"),
   seoDescriptionAr: text("seo_description_ar"),
   seoDescriptionEn: text("seo_description_en"),
-  status: status.notNull().default("draft"),
-  displayOrder: int("display_order").notNull().default(0),
-  metadata: json("metadata"),
-  publishedAt: timestamp("published_at"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+  status: text("status").notNull().default("draft"), // 'draft' | 'published' | 'archived'
+  displayOrder: integer("display_order").notNull().default(0),
+  metadata: jsonb("metadata"),
+  publishedAt: timestamp("published_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const siteSettings = mysqlTable("site_settings", {
-  id: int("id").primaryKey().autoincrement(),
-  key: varchar("key", { length: 191 }).notNull().unique(),
-  value: json("value").notNull(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+export const siteSettings = pgTable("site_settings", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  value: jsonb("value").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const mediaAssets = mysqlTable("media_assets", {
-  id: int("id").primaryKey().autoincrement(),
-  key: varchar("key", { length: 500 }).notNull().unique(),
-  altAr: varchar("alt_ar", { length: 255 }),
-  altEn: varchar("alt_en", { length: 255 }),
-  mimeType: varchar("mime_type", { length: 100 }).notNull(),
-  width: int("width"),
-  height: int("height"),
-  createdBy: int("created_by"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+export const mediaAssets = pgTable("media_assets", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  altAr: text("alt_ar"),
+  altEn: text("alt_en"),
+  mimeType: text("mime_type").notNull(),
+  width: integer("width"),
+  height: integer("height"),
+  createdBy: integer("created_by"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const contactInquiries = mysqlTable("contact_inquiries", {
-  id: int("id").primaryKey().autoincrement(),
-  fullName: varchar("full_name", { length: 191 }).notNull(),
-  company: varchar("company", { length: 191 }),
-  email: varchar("email", { length: 191 }).notNull(),
-  phone: varchar("phone", { length: 50 }),
-  service: varchar("service", { length: 191 }).notNull(),
-  budget: varchar("budget", { length: 100 }),
+export const contactInquiries = pgTable("contact_inquiries", {
+  id: serial("id").primaryKey(),
+  fullName: text("full_name").notNull(),
+  company: text("company"),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  service: text("service").notNull(),
+  budget: text("budget"),
   description: text("description").notNull(),
-  locale: varchar("locale", { length: 5 }).notNull().default("ar"),
-  status: mysqlEnum("status", ["new", "in_progress", "closed"]).notNull().default("new"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  locale: text("locale").notNull().default("ar"),
+  status: text("status").notNull().default("new"), // 'new' | 'in_progress' | 'contacted' | 'closed'
+  notes: text("notes"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const auditLogs = mysqlTable("audit_logs", {
-  id: int("id").primaryKey().autoincrement(),
-  actorId: int("actor_id"),
-  action: varchar("action", { length: 100 }).notNull(),
-  entityType: varchar("entity_type", { length: 100 }).notNull(),
-  entityId: varchar("entity_id", { length: 100 }),
-  details: json("details"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  actorId: integer("actor_id"),
+  action: text("action").notNull(),
+  entityType: text("entity_type").notNull(),
+  entityId: text("entity_id"),
+  details: jsonb("details"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

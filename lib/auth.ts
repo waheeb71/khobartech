@@ -72,9 +72,9 @@ export async function upsertPlatformUser(profile: { openId: string; email: strin
       return { ...profile, role: intendedRole };
     }
     if (existing.email !== profile.email || existing.name !== profile.name || (intendedRole === "owner" && existing.role !== "owner")) {
-      await db.update(users).set({ email: profile.email, name: profile.name ?? null, role: intendedRole === "owner" ? "owner" : existing.role }).where(eq(users.id, existing.id));
+      await db.update(users).set({ email: profile.email, name: profile.name ?? null, role: intendedRole === "owner" ? "owner" : (existing.role as SessionUser["role"]) }).where(eq(users.id, existing.id));
     }
-    return { openId: profile.openId, email: profile.email, name: profile.name, role: intendedRole === "owner" ? "owner" : existing.role };
+    return { openId: profile.openId, email: profile.email, name: profile.name, role: intendedRole === "owner" ? "owner" : (existing.role as SessionUser["role"]) };
   } catch {
     return { ...profile, role: intendedRole };
   }

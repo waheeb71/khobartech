@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     });
 
     const session = await createSession(user);
-    const secretPath = process.env.ADMIN_SECRET_PATH || "/cp-najah-9x7q2m8k";
+    const secretPath = process.env.ADMIN_SECRET_PATH || "/admin";
 
     const response = NextResponse.json({ ok: true, redirectUrl: secretPath });
     response.cookies.set(authCookie.name, session, authCookie.options);
@@ -32,6 +32,6 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const secretPath = process.env.ADMIN_SECRET_PATH || "/cp-najah-9x7q2m8k";
+  const secretPath = process.env.ADMIN_SECRET_PATH || "/admin";
   return NextResponse.redirect(new URL(`${secretPath}/login`, request.nextUrl.origin));
 }

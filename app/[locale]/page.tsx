@@ -6,7 +6,7 @@ import { serviceGroups, solutions, blogTopics } from "@/lib/catalog";
 import { copy, isLocale, localeHref } from "@/lib/i18n";
 import { homeImage, servicePhotos, getBlogImage } from "@/lib/media";
 import { pageMetadata, organizationJsonLd } from "@/lib/seo";
-import { getSetting } from "@/lib/db";
+import { getSetting, getPublishedContent } from "@/lib/db";
 import { PhotoFrame } from "@/components/PhotoFrame";
 import { JsonLd } from "@/components/JsonLd";
 import { TechPartners } from "@/components/TechPartners";
@@ -44,18 +44,23 @@ export default async function HomePage({
   const l = locale as Locale;
   const t = copy[l];
 
-  const hero = await getSetting("home.hero", {
-    ar: {
-      eyebrow: copy.ar.hero.eyebrow,
-      title: copy.ar.hero.title,
-      body: copy.ar.hero.body,
-    },
-    en: {
-      eyebrow: copy.en.hero.eyebrow,
-      title: copy.en.hero.title,
-      body: copy.en.hero.body,
-    },
-  });
+  const [hero, dbServices, dbPosts, dbStats] = await Promise.all([
+    getSetting("home.hero", {
+      ar: {
+        eyebrow: copy.ar.hero.eyebrow,
+        title: copy.ar.hero.title,
+        body: copy.ar.hero.body,
+      },
+      en: {
+        eyebrow: copy.en.hero.eyebrow,
+        title: copy.en.hero.title,
+        body: copy.en.hero.body,
+      },
+    }),
+    getPublishedContent("service"),
+    getPublishedContent("post"),
+    getSetting("home.stats", null as any),
+  ]);
 
   const proof =
     l === "ar"
@@ -63,7 +68,9 @@ export default async function HomePage({
       : ["Enterprise Systems & ERP", "Applications & Digital Solutions", "AI & Automation", "Cybersecurity"];
 
   const stats =
-    l === "ar"
+    dbStats && Array.isArray(dbStats) && dbStats.length > 0
+      ? dbStats.map((s: any) => [s.num, l === "ar" ? s.labelAr : s.labelEn])
+      : l === "ar"
       ? [
           ["+150", "مشروع منجز"],
           ["+15", "سنة خبرة"],
@@ -255,35 +262,65 @@ export default async function HomePage({
           </div>
 
           <div className="service-grid reveal-stagger">
-            {serviceGroups.slice(0, 4).map((group, index) => {
-              const image = servicePhotos[group.slug];
-              const displayNum = serviceGroups.slice(0, 4).length - index;
-              return (
-                <Link
-                  key={group.slug}
-                  href={localeHref(l, `/services/${group.slug}`)}
-                  className="service-card group"
-                >
-                  <div className="service-card-image">
-                    <PhotoFrame
-                      src={image.src}
-                      alt={image.alt[l]}
-                      className="h-full w-full"
-                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 46vw, 100vw"
-                    />
-                  </div>
-                  <div className="service-card-meta">
-                    <span className="service-card-num">
-                      {String(displayNum).padStart(2, "0")}
-                    </span>
-                    <h3 className="service-card-title">{group.title[l]}</h3>
-                    <p className="service-card-description">
-                      {group.description[l]}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
+            {(dbServices && dbServices.length > 0
+              ? dbServices.slice(0, 4).map((service, index) => {
+                  const image = servicePhotos[service.category || "enterprise-systems"] || servicePhotos["enterprise-systems"];
+                  const displayNum = Math.min(dbServices.length, 4) - index;
+                  return (
+                    <Link
+                      key={service.slug}
+                      href={localeHref(l, `/services/${service.category || "enterprise-systems"}`)}
+                      className="service-card group"
+                    >
+                      <div className="service-card-image">
+                        <PhotoFrame
+                          src={image.src}
+                          alt={image.alt[l]}
+                          className="h-full w-full"
+                          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 46vw, 100vw"
+                        />
+                      </div>
+                      <div className="service-card-meta">
+                        <span className="service-card-num">
+                          {String(displayNum).padStart(2, "0")}
+                        </span>
+                        <h3 className="service-card-title">{l === "ar" ? service.titleAr : service.titleEn}</h3>
+                        <p className="service-card-description">
+                          {l === "ar" ? service.excerptAr || service.bodyAr : service.excerptEn || service.bodyEn}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })
+              : serviceGroups.slice(0, 4).map((group, index) => {
+                  const image = servicePhotos[group.slug];
+                  const displayNum = serviceGroups.slice(0, 4).length - index;
+                  return (
+                    <Link
+                      key={group.slug}
+                      href={localeHref(l, `/services/${group.slug}`)}
+                      className="service-card group"
+                    >
+                      <div className="service-card-image">
+                        <PhotoFrame
+                          src={image.src}
+                          alt={image.alt[l]}
+                          className="h-full w-full"
+                          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 46vw, 100vw"
+                        />
+                      </div>
+                      <div className="service-card-meta">
+                        <span className="service-card-num">
+                          {String(displayNum).padStart(2, "0")}
+                        </span>
+                        <h3 className="service-card-title">{group.title[l]}</h3>
+                        <p className="service-card-description">
+                          {group.description[l]}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                }))}
           </div>
         </div>
       </section>
@@ -477,13 +514,15 @@ export default async function HomePage({
             </Link>
           </div>
           <div className="insight-grid reveal-stagger">
-            {blogTopics.slice(0, 3).map((post) => {
+            {(dbPosts && dbPosts.length > 0 ? dbPosts.slice(0, 3) : blogTopics.slice(0, 3)).map((post: any) => {
               const image = getBlogImage(post.slug);
+              const title = post.titleAr ? (l === "ar" ? post.titleAr : post.titleEn) : (l === "ar" ? post.ar : post.en);
+              const category = post.category ? post.category : (l === "ar" ? post.categoryAr : post.categoryEn);
               return (
                 <article key={post.slug} className="insight-card group">
                   <Link
                     href={localeHref(l, `/blog/${post.slug}`)}
-                    aria-label={l === "ar" ? post.ar : post.en}
+                    aria-label={title}
                   >
                     <PhotoFrame
                       src={image.src}
@@ -492,12 +531,10 @@ export default async function HomePage({
                       sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
                     />
                   </Link>
-                  <p className="insight-card-category">
-                    {l === "ar" ? post.categoryAr : post.categoryEn}
-                  </p>
+                  <p className="insight-card-category">{category}</p>
                   <h3 className="insight-card-title">
                     <Link href={localeHref(l, `/blog/${post.slug}`)}>
-                      {l === "ar" ? post.ar : post.en}
+                      {title}
                     </Link>
                   </h3>
                   <Link
