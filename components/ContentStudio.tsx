@@ -29,6 +29,13 @@ import {
   Mail,
   MapPin,
   Save,
+  Image as ImageIcon,
+  UploadCloud,
+  Copy,
+  Check,
+  X,
+  HardDrive,
+  ArrowUpRight,
 } from "lucide-react";
 
 export type ContentType = "service" | "product" | "page" | "post" | "testimonial" | "portfolio" | "solution";
@@ -85,11 +92,22 @@ export type AuditLog = {
   createdAt: string;
 };
 
+export type MediaItem = {
+  id: number;
+  key: string;
+  url: string;
+  altAr: string | null;
+  altEn: string | null;
+  mimeType: string;
+  createdAt: string;
+};
+
 export type StudioData = {
   items: Item[];
   inquiries: Inquiry[];
   settings: Setting[];
   logs: AuditLog[];
+  media?: MediaItem[];
   isLiveDb?: boolean;
 };
 
@@ -120,18 +138,25 @@ export function ContentStudio({
   initialData?: StudioData | null;
 }) {
   const [data, setData] = useState<StudioData | null>(initialData ?? null);
-  const [activeTab, setActiveTab] = useState<"overview" | "services" | "products" | "posts" | "inquiries" | "settings" | "logs">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "services" | "products" | "posts" | "media" | "inquiries" | "settings" | "logs">("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [editingItem, setEditingItem] = useState<(Omit<Item, "id" | "updatedAt"> & { id?: number }) | null>(null);
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
+  // Media Library & Upload States
+  const [mediaUploading, setMediaUploading] = useState(false);
+  const [mediaSearch, setMediaSearch] = useState("");
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
+  const [showMediaPicker, setShowMediaPicker] = useState<"item" | "hero" | null>(null);
+
   // Settings State
   const [heroArTitle, setHeroArTitle] = useState("");
   const [heroArBody, setHeroArBody] = useState("");
   const [heroEnTitle, setHeroEnTitle] = useState("");
   const [heroEnBody, setHeroEnBody] = useState("");
+  const [heroImage, setHeroImage] = useState("/hero.jpg");
   const [contactPhone, setContactPhone] = useState("+966 13 800 0000");
   const [contactEmail, setContactEmail] = useState("info@khobartech.com");
   const [contactWhatsapp, setContactWhatsapp] = useState("+966 50 000 0000");
@@ -169,6 +194,7 @@ export function ContentStudio({
         setHeroArBody(hero.ar?.body || "");
         setHeroEnTitle(hero.en?.title || "");
         setHeroEnBody(hero.en?.body || "");
+        setHeroImage(hero.image || hero.ar?.image || "/hero.jpg");
       }
       const contact = data.settings.find((s) => s.key === "company.contact")?.value;
       if (contact) {
@@ -279,6 +305,7 @@ export function ContentStudio({
             value: {
               ar: { eyebrow: "تكنولوجيا الخبر للاستشارات التقنية", title: heroArTitle, body: heroArBody, primary: "استكشف خدماتنا", secondary: "تحدث مع خبرائنا" },
               en: { eyebrow: "Khobar Tech — Technology Consulting", title: heroEnTitle, body: heroEnBody, primary: "Explore services", secondary: "Talk to our experts" },
+              image: heroImage,
             },
           },
         }),
@@ -312,6 +339,73 @@ export function ContentStudio({
     } finally {
       setLoading(false);
     }
+  };
+
+  // Media Assets and Upload Handlers
+  const mediaList = useMemo(() => data?.media || [], [data]);
+
+  const filteredMedia = useMemo(() => {
+    if (!mediaSearch) return mediaList;
+    return mediaList.filter(
+      (m) =>
+        m.key.toLowerCase().includes(mediaSearch.toLowerCase()) ||
+        (m.altAr && m.altAr.toLowerCase().includes(mediaSearch.toLowerCase()))
+    );
+  }, [mediaList, mediaSearch]);
+
+  const handleUploadImageFile = async (file: File) => {
+    if (!file) return null;
+    setMediaUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("altAr", file.name);
+
+      const res = await fetch("/api/admin/media", {
+        method: "POST",
+        body: formData,
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "فشل رفع الصورة");
+      }
+
+      showToast(`تم رفع الصورة بنجاح: ${file.name}`);
+      await refreshData();
+      return (json.url || json.key) as string;
+    } catch (err: any) {
+      showToast(err.message || "حدث خطأ أثناء رفع الصورة", "error");
+      return null;
+    } finally {
+      setMediaUploading(false);
+    }
+  };
+
+  const handleDeleteMedia = async (id: number, key: string) => {
+    if (!confirm("هل أنت متأكد من رغبتك في حذف هذه الصورة من التخزين السحابي وقاعدة البيانات؟")) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/media?id=${id}&key=${encodeURIComponent(key)}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("فشل حذف الصورة");
+      showToast("تم حذف الصورة بنجاح");
+      await refreshData();
+    } catch (err: any) {
+      showToast(err.message || "تعذر حذف الصورة", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+    }
+    setCopiedUrl(text);
+    showToast("تم نسخ رابط الصورة إلى الحافظة!");
+    setTimeout(() => setCopiedUrl(null), 3000);
   };
 
   // Filter items
@@ -392,6 +486,16 @@ export function ContentStudio({
           >
             <FileText className="h-4 w-4" />
             <span>المدونة والرؤى ({postsList.length})</span>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab("media"); setEditingItem(null); }}
+            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition ${
+              activeTab === "media" ? "bg-cyan text-[#070e1c] shadow-lg shadow-cyan/20" : "bg-white/[0.04] text-[#8ba0be] hover:bg-white/[0.08] hover:text-white"
+            }`}
+          >
+            <ImageIcon className="h-4 w-4" />
+            <span>مكتبة الصور والوسائط ({mediaList.length})</span>
           </button>
 
           <button
@@ -749,24 +853,142 @@ export function ContentStudio({
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-[#8ba0be] mb-2">نبذة مختصرة (عربي)</label>
-            <textarea
-              rows={2}
-              value={editingItem.excerptAr || ""}
-              onChange={(e) => setEditingItem({ ...editingItem, excerptAr: e.target.value })}
-              className="w-full rounded-xl border border-white/10 bg-[#081224] p-3 text-xs text-white focus:border-cyan focus:outline-none"
-            />
+          {/* Image & Media Controller */}
+          <div className="rounded-xl border border-white/10 bg-[#081224] p-5 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <label className="block text-xs font-bold text-white flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4 text-cyan" />
+                  <span>الصورة البارزة للمحتوى (Cloudflare R2 / CDN)</span>
+                </label>
+                <p className="text-[11px] text-[#8ba0be] mt-0.5">
+                  ارفع صورة عالية الجودة مباشرة إلى Cloudflare R2 أو اختر من مكتبة الوسائط
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-cyan/10 px-3 py-1.5 text-xs font-bold text-cyan hover:bg-cyan hover:text-[#070e1c] transition border border-cyan/30">
+                  <UploadCloud className="h-3.5 w-3.5" />
+                  <span>{mediaUploading ? "جارٍ الرفع..." : "رفع صورة جديدة"}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={mediaUploading}
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const url = await handleUploadImageFile(file);
+                        if (url) {
+                          setEditingItem({ ...editingItem, imageKey: url });
+                        }
+                      }
+                    }}
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => setShowMediaPicker("item")}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-[#8ba0be] hover:bg-white/10 hover:text-white transition"
+                >
+                  <Layers className="h-3.5 w-3.5" />
+                  <span>اختيار من المكتبة ({mediaList.length})</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-[140px_1fr] items-center">
+              {/* Thumbnail Preview */}
+              <div className="relative aspect-[16/10] w-full rounded-lg overflow-hidden border border-white/10 bg-[#0c1830] flex items-center justify-center">
+                {editingItem.imageKey ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={editingItem.imageKey}
+                    alt="معاينة الصورة"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="text-center p-2 text-[10px] text-[#5a6b7f]">
+                    <ImageIcon className="h-6 w-6 mx-auto mb-1 opacity-40" />
+                    <span>بدون صورة</span>
+                  </div>
+                )}
+              </div>
+
+              {/* URL input and action */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    dir="ltr"
+                    type="text"
+                    value={editingItem.imageKey || ""}
+                    onChange={(e) => setEditingItem({ ...editingItem, imageKey: e.target.value })}
+                    placeholder="https://pub-e9788e46474044d585e2622e2c6ce74d.r2.dev/..."
+                    className="w-full rounded-xl border border-white/10 bg-[#0c1830] p-2.5 text-xs text-white font-mono focus:border-cyan focus:outline-none"
+                  />
+                  {editingItem.imageKey && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingItem({ ...editingItem, imageKey: "" })}
+                      className="rounded-lg border border-red-500/20 bg-red-500/10 p-2 text-red-400 hover:bg-red-500 hover:text-white transition"
+                      title="مسح الصورة"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+                <p className="text-[10px] text-[#5a6b7f]">
+                  يمكنك وضع رابط مباشر من Cloudflare R2 أو أي رابط صورة عامة.
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-[#8ba0be] mb-2">المحتوى والتفاصيل الكاملة (عربي)</label>
-            <textarea
-              rows={6}
-              value={editingItem.bodyAr || ""}
-              onChange={(e) => setEditingItem({ ...editingItem, bodyAr: e.target.value })}
-              className="w-full rounded-xl border border-white/10 bg-[#081224] p-3 text-xs text-white focus:border-cyan focus:outline-none"
-            />
+          {/* Excerpts */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-xs font-bold text-[#8ba0be] mb-2">نبذة مختصرة (عربي)</label>
+              <textarea
+                rows={2}
+                value={editingItem.excerptAr || ""}
+                onChange={(e) => setEditingItem({ ...editingItem, excerptAr: e.target.value })}
+                className="w-full rounded-xl border border-white/10 bg-[#081224] p-3 text-xs text-white focus:border-cyan focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-[#8ba0be] mb-2">نبذة مختصرة (English)</label>
+              <textarea
+                dir="ltr"
+                rows={2}
+                value={editingItem.excerptEn || ""}
+                onChange={(e) => setEditingItem({ ...editingItem, excerptEn: e.target.value })}
+                className="w-full rounded-xl border border-white/10 bg-[#081224] p-3 text-xs text-white focus:border-cyan focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Full Bodies */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-xs font-bold text-[#8ba0be] mb-2">المحتوى والتفاصيل الكاملة (عربي)</label>
+              <textarea
+                rows={6}
+                value={editingItem.bodyAr || ""}
+                onChange={(e) => setEditingItem({ ...editingItem, bodyAr: e.target.value })}
+                className="w-full rounded-xl border border-white/10 bg-[#081224] p-3 text-xs text-white focus:border-cyan focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-[#8ba0be] mb-2">المحتوى والتفاصيل الكاملة (English)</label>
+              <textarea
+                dir="ltr"
+                rows={6}
+                value={editingItem.bodyEn || ""}
+                onChange={(e) => setEditingItem({ ...editingItem, bodyEn: e.target.value })}
+                className="w-full rounded-xl border border-white/10 bg-[#081224] p-3 text-xs text-white focus:border-cyan focus:outline-none"
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-3 border-t border-white/10 pt-4">
@@ -787,6 +1009,159 @@ export function ContentStudio({
             </button>
           </div>
         </form>
+      )}
+
+      {/* ====================================================================
+          TAB 4.5: MEDIA LIBRARY (CLOUDFLARE R2 & ASSETS)
+      ==================================================================== */}
+      {activeTab === "media" && (
+        <div className="space-y-6">
+          {/* Cloudflare R2 Status & Quick Upload Banner */}
+          <div className="rounded-2xl border border-cyan/20 bg-gradient-to-br from-[#0c1830] to-[#081224] p-6 sm:p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 rounded-full border border-cyan/30 bg-cyan/10 px-3 py-1 text-xs font-bold text-cyan">
+                  <HardDrive className="h-3.5 w-3.5" />
+                  <span>تخزين الوسائط السحابي: Cloudflare R2 Object Storage</span>
+                </div>
+                <h3 className="text-xl font-bold text-white">مكتبة الوسائط والصور المرفوعة</h3>
+                <p className="text-xs text-[#8ba0be] max-w-2xl leading-relaxed">
+                  يتم حفظ جميع الصور المرفوعة بأمان في باكت Cloudflare R2 (<code className="text-cyan font-mono">khobartech</code>) ومزامنتها مع جدول <code className="text-cyan font-mono">media_assets</code> بقاعدة بيانات Neon PostgreSQL مع توزيع عالمي فائق السرعة عبر CDN.
+                </p>
+                <div className="flex flex-wrap items-center gap-4 text-xs text-[#5a6b7f] pt-2">
+                  <span>باكت التخزين: <strong className="text-white font-mono">khobartech</strong></span>
+                  <span>•</span>
+                  <span>دومين الـ CDN: <strong className="text-cyan font-mono">pub-e9788e46474044d585e2622e2c6ce74d.r2.dev</strong></span>
+                  <span>•</span>
+                  <span>إجمالي الملفات: <strong className="text-white font-bold">{mediaList.length}</strong></span>
+                </div>
+              </div>
+
+              {/* Upload Box */}
+              <div className="shrink-0">
+                <label className="cursor-pointer flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-cyan/40 bg-cyan/5 px-8 py-6 text-center transition hover:border-cyan hover:bg-cyan/10">
+                  <UploadCloud className={`h-8 w-8 text-cyan ${mediaUploading ? "animate-bounce" : ""}`} />
+                  <span className="text-xs font-bold text-white">
+                    {mediaUploading ? "جارٍ رفع الصورة إلى R2..." : "رفع صورة جديدة إلى Cloudflare R2"}
+                  </span>
+                  <span className="text-[10px] text-[#8ba0be]">PNG, JPG, WebP, AVIF, SVG (حتى 10MB)</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={mediaUploading}
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        await handleUploadImageFile(file);
+                        e.target.value = "";
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Search & Actions Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="relative flex-1 min-w-[240px] max-w-md">
+              <Search className="absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5a6b7f]" />
+              <input
+                type="text"
+                value={mediaSearch}
+                onChange={(e) => setMediaSearch(e.target.value)}
+                placeholder="البحث في الصور بالاسم أو الرابط..."
+                className="w-full rounded-xl border border-white/10 bg-[#0c1830] pr-10 pl-4 py-2.5 text-xs text-white placeholder-[#5a6b7f] focus:border-cyan focus:outline-none"
+              />
+            </div>
+            <span className="text-xs text-[#8ba0be]">
+              عرض {filteredMedia.length} من {mediaList.length} صورة
+            </span>
+          </div>
+
+          {/* Media Grid */}
+          {filteredMedia.length === 0 ? (
+            <div className="rounded-2xl border border-white/10 bg-[#0c1830] py-16 text-center">
+              <ImageIcon className="h-12 w-12 mx-auto text-[#5a6b7f] opacity-50 mb-3" />
+              <p className="text-sm font-bold text-white">لا توجد صور في المكتبة حالياً</p>
+              <p className="text-xs text-[#8ba0be] mt-1">ابدأ برفع أول صورة من الزر أعلاه وسيتم حفظها في Cloudflare R2 فوراً</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+              {filteredMedia.map((media) => (
+                <div
+                  key={media.id}
+                  className="group relative flex flex-col rounded-xl border border-white/10 bg-[#0c1830] overflow-hidden hover:border-cyan/40 transition"
+                >
+                  <div className="relative aspect-[16/10] bg-[#070e1c] overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={media.url}
+                      alt={media.altAr || "صورة"}
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-2 justify-between">
+                      <a
+                        href={media.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded bg-black/60 p-1 text-white hover:text-cyan transition"
+                        title="معاينة في نافذة جديدة"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMedia(media.id, media.key)}
+                        className="rounded bg-red-500/80 p-1 text-white hover:bg-red-500 transition"
+                        title="حذف من R2"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-3 flex flex-col flex-1 justify-between gap-2">
+                    <div>
+                      <p className="text-xs font-bold text-white truncate" title={media.altAr || media.key}>
+                        {media.altAr || media.key.split("/").pop()}
+                      </p>
+                      <p className="text-[10px] text-[#5a6b7f] font-mono truncate" dir="ltr">
+                        {media.key}
+                      </p>
+                    </div>
+
+                    <div className="pt-2 border-t border-white/5 flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(media.url)}
+                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-cyan hover:underline"
+                      >
+                        {copiedUrl === media.url ? (
+                          <>
+                            <Check className="h-3 w-3 text-emerald-400" />
+                            <span className="text-emerald-400">تم النسخ!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-3 w-3" />
+                            <span>نسخ الرابط</span>
+                          </>
+                        )}
+                      </button>
+
+                      <span className="text-[10px] text-[#5a6b7f]">
+                        {new Date(media.createdAt).toLocaleDateString("ar-SA")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {/* ====================================================================
@@ -993,6 +1368,76 @@ export function ContentStudio({
                 className="w-full rounded-xl border border-white/10 bg-[#081224] p-3 text-xs text-white focus:border-cyan focus:outline-none"
               />
             </div>
+
+            {/* Section: Hero Banner Image */}
+            <div className="rounded-xl border border-white/10 bg-[#081224] p-5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h5 className="text-xs font-bold text-white flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4 text-cyan" />
+                    <span>صورة خلفية الواجهة الرئيسية (Hero Banner Image)</span>
+                  </h5>
+                  <p className="text-[11px] text-[#8ba0be] mt-0.5">
+                    الصورة التي تظهر في أعلى الصفحة الرئيسية للموقع خلف النصوص الترحيبية
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg bg-cyan/10 px-3 py-1.5 text-xs font-bold text-cyan hover:bg-cyan hover:text-[#070e1c] transition border border-cyan/30">
+                    <UploadCloud className="h-3.5 w-3.5" />
+                    <span>{mediaUploading ? "جارٍ الرفع..." : "رفع صورة للواجهة"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={mediaUploading}
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const url = await handleUploadImageFile(file);
+                          if (url) {
+                            setHeroImage(url);
+                          }
+                        }
+                      }}
+                    />
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowMediaPicker("hero")}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-[#8ba0be] hover:bg-white/10 hover:text-white transition"
+                  >
+                    <Layers className="h-3.5 w-3.5" />
+                    <span>اختيار من المكتبة ({mediaList.length})</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-[180px_1fr] items-center">
+                <div className="relative aspect-[16/9] w-full rounded-lg overflow-hidden border border-white/10 bg-[#0c1830]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={heroImage || "/hero.jpg"}
+                    alt="خلفية الواجهة"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <input
+                    dir="ltr"
+                    type="text"
+                    value={heroImage}
+                    onChange={(e) => setHeroImage(e.target.value)}
+                    placeholder="https://pub-e9788e46474044d585e2622e2c6ce74d.r2.dev/... أو /hero.jpg"
+                    className="w-full rounded-xl border border-white/10 bg-[#0c1830] p-3 text-xs text-white font-mono focus:border-cyan focus:outline-none"
+                  />
+                  <p className="text-[10px] text-[#5a6b7f]">
+                    الافتراضي هو <code className="text-cyan font-mono">/hero.jpg</code> (صورة برج الفيصلية وأفق الرياض التقني)
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Section: Official Corporate Details */}
@@ -1103,6 +1548,69 @@ export function ContentStudio({
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Quick Media Picker Modal */}
+      {showMediaPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md">
+          <div className="w-full max-w-4xl max-h-[85vh] flex flex-col rounded-2xl border border-white/10 bg-[#0c1830] shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-white/10 p-5">
+              <div className="flex items-center gap-2">
+                <ImageIcon className="h-5 w-5 text-cyan" />
+                <h3 className="text-base font-bold text-white">اختر صورة من مكتبة الوسائط</h3>
+              </div>
+              <button
+                onClick={() => setShowMediaPicker(null)}
+                className="text-xs font-semibold text-[#8ba0be] hover:text-white"
+              >
+                إغلاق (✕)
+              </button>
+            </div>
+
+            <div className="p-4 border-b border-white/5">
+              <input
+                type="text"
+                value={mediaSearch}
+                onChange={(e) => setMediaSearch(e.target.value)}
+                placeholder="ابحث بالاسم أو الرابط..."
+                className="w-full rounded-xl border border-white/10 bg-[#081224] px-4 py-2 text-xs text-white placeholder-[#5a6b7f] focus:border-cyan focus:outline-none"
+              />
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5">
+              {filteredMedia.length === 0 ? (
+                <div className="py-16 text-center text-xs text-[#8ba0be]">
+                  لا توجد صور متطابقة في المكتبة. يمكنك رفع صورة جديدة مباشرة من الزر في النموذج.
+                </div>
+              ) : (
+                <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
+                  {filteredMedia.map((m) => (
+                    <div
+                      key={m.id}
+                      onClick={() => {
+                        if (showMediaPicker === "item" && editingItem) {
+                          setEditingItem({ ...editingItem, imageKey: m.url });
+                        } else if (showMediaPicker === "hero") {
+                          setHeroImage(m.url);
+                        }
+                        setShowMediaPicker(null);
+                        showToast("تم اختيار الصورة بنجاح");
+                      }}
+                      className="group cursor-pointer rounded-xl border border-white/10 bg-[#081224] p-2 hover:border-cyan hover:bg-[#0c1c38] transition"
+                    >
+                      <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-[#070e1c] mb-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={m.url} alt={m.altAr || "صورة"} className="h-full w-full object-cover group-hover:scale-105 transition" />
+                      </div>
+                      <p className="text-[11px] font-bold text-white truncate">{m.altAr || m.key.split("/").pop()}</p>
+                      <span className="text-[10px] text-cyan block mt-1">انقر للاختيار</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

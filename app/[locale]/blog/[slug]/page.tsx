@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpLeft, Calendar, User, ArrowRight, ArrowLeft } from "lucide-react";
 import { JsonLd } from "@/components/JsonLd";
@@ -32,7 +32,8 @@ export default async function BlogPost({ params }: { params: Promise<{ locale: s
   const title = l === "ar" ? post.titleAr : post.titleEn;
   const description = l === "ar" ? post.excerptAr : post.excerptEn;
   const body = plain(l === "ar" ? post.bodyAr : post.bodyEn) || plain(description);
-  const image = getBlogImage(slug);
+  const fallbackImage = getBlogImage(slug);
+  const imageSrc = post.imageKey || fallbackImage.src;
 
   return (
     <>
@@ -42,7 +43,7 @@ export default async function BlogPost({ params }: { params: Promise<{ locale: s
           "@type": "Article",
           headline: title,
           description,
-          image: image.src,
+          image: imageSrc,
           inLanguage: l,
           author: { "@type": "Organization", name: "تكنولوجيا الخبر" },
           publisher: { "@type": "Organization", name: "تكنولوجيا الخبر" },
@@ -77,8 +78,8 @@ export default async function BlogPost({ params }: { params: Promise<{ locale: s
 
           <div className="relative mt-10 overflow-hidden rounded-2xl border border-white/10 shadow-2xl reveal-scale">
             <PhotoFrame
-              src={image.src}
-              alt={image.alt[l]}
+              src={imageSrc}
+              alt={title || fallbackImage.alt[l]}
               className="aspect-[16/9] w-full"
               sizes="(min-width: 1024px) 75vw, 100vw"
               priority

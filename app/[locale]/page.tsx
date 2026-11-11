@@ -110,7 +110,7 @@ export default async function HomePage({
         {/* Background image */}
         <div className="hero-bg">
           <PhotoFrame
-            src={homeImage.src}
+            src={(hero as any)?.image || (hero as any)?.[l]?.image || homeImage.src}
             alt={homeImage.alt[l]}
             className="absolute inset-0 h-full w-full"
             priority
@@ -264,10 +264,11 @@ export default async function HomePage({
           <div className="service-grid reveal-stagger">
             {(dbServices && dbServices.length > 0
               ? dbServices.slice(0, 4).map((service, index) => {
-                  const image =
-                    (service.category && servicePhotos[service.category]) ||
-                    servicePhotos.enterprise ||
-                    homeImage;
+                  const imageSrc =
+                    service.imageKey ||
+                    (service.category && servicePhotos[service.category]?.src) ||
+                    servicePhotos.enterprise?.src ||
+                    homeImage.src;
                   const displayNum = Math.min(dbServices.length, 4) - index;
                   return (
                     <Link
@@ -277,8 +278,8 @@ export default async function HomePage({
                     >
                       <div className="service-card-image">
                         <PhotoFrame
-                          src={image.src}
-                          alt={image.alt[l]}
+                          src={imageSrc}
+                          alt={l === "ar" ? service.titleAr : service.titleEn}
                           className="h-full w-full"
                           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 46vw, 100vw"
                         />
@@ -518,7 +519,8 @@ export default async function HomePage({
           </div>
           <div className="insight-grid reveal-stagger">
             {(dbPosts && dbPosts.length > 0 ? dbPosts.slice(0, 3) : blogTopics.slice(0, 3)).map((post: any) => {
-              const image = getBlogImage(post.slug);
+              const fallbackImage = getBlogImage(post.slug);
+              const imageSrc = post.imageKey || fallbackImage.src;
               const title = post.titleAr ? (l === "ar" ? post.titleAr : post.titleEn) : (l === "ar" ? post.ar : post.en);
               const category = post.category ? post.category : (l === "ar" ? post.categoryAr : post.categoryEn);
               return (
@@ -528,8 +530,8 @@ export default async function HomePage({
                     aria-label={title}
                   >
                     <PhotoFrame
-                      src={image.src}
-                      alt={image.alt[l]}
+                      src={imageSrc}
+                      alt={title || fallbackImage.alt[l]}
                       className="insight-image"
                       sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
                     />

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { auditLogs, contactInquiries, contentItems, siteSettings } from "@/drizzle/schema";
+import { auditLogs, contactInquiries, contentItems, mediaAssets, siteSettings } from "@/drizzle/schema";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { sanitizeRichText } from "@/lib/sanitize";
 import { readLocalStore, writeLocalStore, StoredContentItem } from "@/lib/local-store";
+import { getR2PublicUrl } from "@/lib/r2";
 
 const contentSchema = z.object({
   id: z.number().int().optional(),
@@ -37,16 +38,24 @@ export async function GET() {
         inquiries: store.inquiries,
         settings: store.settings,
         logs: store.logs,
+        media: [],
         isLiveDb: false,
       });
     }
-    const [items, inquiries, settings, logs] = await Promise.all([
+    const [items, inquiries, settings, logs, mediaRows] = await Promise.all([
       db.select().from(contentItems).orderBy(desc(contentItems.updatedAt)).limit(100),
       db.select().from(contactInquiries).orderBy(desc(contactInquiries.createdAt)).limit(100),
       db.select().from(siteSettings).orderBy(desc(siteSettings.updatedAt)),
       db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt)).limit(50),
+      db.select().from(mediaAssets).orderBy(desc(mediaAssets.createdAt)).limit(100),
     ]);
-    return NextResponse.json({ items, inquiries, settings, logs, isLiveDb: true });
+
+    const media = mediaRows.map((m) => ({
+      ...m,
+      url: getR2PublicUrl(m.key),
+    }));
+
+    return NextResponse.json({ items, inquiries, settings, logs, media, isLiveDb: true });
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

@@ -75,7 +75,8 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
           {posts.length ? (
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 reveal-stagger">
               {posts.map((post) => {
-                const image = getBlogImage(post.slug);
+                const fallbackImage = getBlogImage(post.slug);
+                const imageSrc = post.imageKey || fallbackImage.src;
                 const title = l === "ar" ? post.titleAr : post.titleEn;
                 const excerpt = l === "ar" ? post.excerptAr : post.excerptEn;
                 return (
@@ -85,8 +86,8 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
                   >
                     <Link href={localeHref(l, `/blog/${post.slug}`)} aria-label={title} className="relative aspect-[16/9] overflow-hidden">
                       <PhotoFrame
-                        src={image.src}
-                        alt={image.alt[l]}
+                        src={imageSrc}
+                        alt={title || fallbackImage.alt[l]}
                         className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
                       />
