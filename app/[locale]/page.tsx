@@ -264,7 +264,10 @@ export default async function HomePage({
           <div className="service-grid reveal-stagger">
             {(dbServices && dbServices.length > 0
               ? dbServices.slice(0, 4).map((service, index) => {
-                  const image = servicePhotos[service.category || "enterprise-systems"] || servicePhotos["enterprise-systems"];
+                  const image =
+                    (service.category && servicePhotos[service.category]) ||
+                    servicePhotos.enterprise ||
+                    homeImage;
                   const displayNum = Math.min(dbServices.length, 4) - index;
                   return (
                     <Link

@@ -2,23 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const secretPath = (process.env.ADMIN_SECRET_PATH || "/cp-khobar-9x7q2m8k").replace(/\/$/, "");
+  const secretPath = (process.env.ADMIN_SECRET_PATH || "/admin").replace(/\/$/, "");
 
-  // 1. Hide direct /admin and /admin/* URLs completely (Return 404)
+  // 1. If an obscure secret path other than /admin is configured, protect and rewrite
+  if (secretPath !== "/admin") {
+    if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+      return NextResponse.rewrite(new URL("/not-found", request.url));
+    }
+    if (pathname === secretPath) {
+      const headers = new Headers(request.headers);
+      headers.set("x-khobar-locale", "ar");
+      return NextResponse.rewrite(new URL("/admin", request.url), { request: { headers } });
+    }
+    if (pathname === `${secretPath}/login`) {
+      const headers = new Headers(request.headers);
+      headers.set("x-khobar-locale", "ar");
+      return NextResponse.rewrite(new URL("/admin/login", request.url), { request: { headers } });
+    }
+  }
+
+  // 2. Direct /admin and /admin/login access
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
-    return NextResponse.rewrite(new URL("/not-found", request.url));
-  }
-
-  // 2. Map the obscure secret path to the internal admin routes
-  if (pathname === secretPath) {
     const headers = new Headers(request.headers);
     headers.set("x-khobar-locale", "ar");
-    return NextResponse.rewrite(new URL("/admin", request.url), { request: { headers } });
-  }
-  if (pathname === `${secretPath}/login`) {
-    const headers = new Headers(request.headers);
-    headers.set("x-khobar-locale", "ar");
-    return NextResponse.rewrite(new URL("/admin/login", request.url), { request: { headers } });
+    return NextResponse.next({ request: { headers } });
   }
 
   const locale = pathname.startsWith("/en") ? "en" : "ar";
