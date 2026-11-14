@@ -23,6 +23,10 @@ interface ProjectCostEstimatorProps {
   locale: string;
 }
 
+function formatCurrency(amount: number): string {
+  return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 export function ProjectCostEstimator({ locale }: ProjectCostEstimatorProps) {
   const isAr = locale === "ar";
 
@@ -130,7 +134,7 @@ export function ProjectCostEstimator({ locale }: ProjectCostEstimatorProps) {
 حجم المنشأة: ${activeScale.labelAr}
 التكاملات الإضافية: ${integrations.join(", ")}
 استضافة البيانات: ${hosting}
-الميزانية التقديرية المحسوبة: ${estimatedMinPrice.toLocaleString()} - ${estimatedMaxPrice.toLocaleString()} ر.س
+الميزانية التقديرية المحسوبة: ${formatCurrency(estimatedMinPrice)} - ${formatCurrency(estimatedMaxPrice)} ر.س
 المدة المتوقعة: ${estimatedWeeks} أسابيع`;
 
       const res = await fetch("/api/contact", {
@@ -142,7 +146,7 @@ export function ProjectCostEstimator({ locale }: ProjectCostEstimatorProps) {
           email,
           phone,
           service: activeSolution.titleAr,
-          budget: `${estimatedMinPrice.toLocaleString()} - ${estimatedMaxPrice.toLocaleString()} SAR`,
+          budget: `${formatCurrency(estimatedMinPrice)} - ${formatCurrency(estimatedMaxPrice)} SAR`,
           description: summaryDescription,
           locale,
           inquiryType: "estimate",
@@ -261,8 +265,8 @@ export function ProjectCostEstimator({ locale }: ProjectCostEstimatorProps) {
                         </h4>
                         <div className="mt-2 text-xs text-slate-400">
                           {isAr ? "يبدأ من " : "Starting around "}
-                          <span className="text-cyan-300 font-bold">
-                            {sol.basePrice.toLocaleString()} {isAr ? "ر.س" : "SAR"}
+                          <span className="text-cyan-300 font-bold" suppressHydrationWarning>
+                            {formatCurrency(sol.basePrice)} {isAr ? "ر.س" : "SAR"}
                           </span>
                         </div>
                       </div>
@@ -377,8 +381,8 @@ export function ProjectCostEstimator({ locale }: ProjectCostEstimatorProps) {
                     <span className="text-xs text-slate-400 uppercase font-semibold block">
                       {isAr ? "الميزانية الاستثمارية التقديرية" : "Estimated Investment Range"}
                     </span>
-                    <div className="text-xl sm:text-2xl font-bold text-white mt-1">
-                      {estimatedMinPrice.toLocaleString()} - {estimatedMaxPrice.toLocaleString()}{" "}
+                    <div className="text-xl sm:text-2xl font-bold text-white mt-1" suppressHydrationWarning>
+                      {formatCurrency(estimatedMinPrice)} - {formatCurrency(estimatedMaxPrice)}{" "}
                       <span className="text-sm font-normal text-cyan-300">{isAr ? "ر.س" : "SAR"}</span>
                     </div>
                   </div>

@@ -1287,7 +1287,7 @@ export function ContentStudio({
                           {inq.service}
                         </span>
                         {inq.budget && <span>الميزانية: {inq.budget}</span>}
-                        <span>{new Date(inq.createdAt).toLocaleString("ar-SA")}</span>
+                        <span suppressHydrationWarning>{new Date(inq.createdAt).toLocaleString("ar-SA")}</span>
                       </div>
                     </div>
 
@@ -1470,7 +1470,7 @@ export function ContentStudio({
                       <div className="mt-2 flex flex-wrap items-center gap-4 text-[11px] text-[#5a6b7f]">
                         {app.university && <span>الجامعة: {app.university}</span>}
                         {app.experienceYears && <span>الخبرة/المعدل: {app.experienceYears}</span>}
-                        <span>{new Date(app.createdAt).toLocaleString("ar-SA")}</span>
+                        <span suppressHydrationWarning>{new Date(app.createdAt).toLocaleString("ar-SA")}</span>
                       </div>
                     </div>
 
@@ -1833,7 +1833,7 @@ export function ContentStudio({
                     <span className="font-mono text-cyan font-semibold">[{log.action.toUpperCase()}]</span>
                     <span className="text-white font-medium">{log.entityType}: {log.entityId || "—"}</span>
                   </div>
-                  <span className="text-[#8ba0be]">{new Date(log.createdAt).toLocaleString("ar-SA")}</span>
+                  <span className="text-[#8ba0be]" suppressHydrationWarning>{new Date(log.createdAt).toLocaleString("ar-SA")}</span>
                 </div>
               ))}
             </div>
