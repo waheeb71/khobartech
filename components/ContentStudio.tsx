@@ -36,6 +36,8 @@ import {
   X,
   HardDrive,
   ArrowUpRight,
+  GraduationCap,
+  Download,
 } from "lucide-react";
 
 export type ContentType = "service" | "product" | "page" | "post" | "testimonial" | "portfolio" | "solution";
@@ -72,6 +74,24 @@ export type Inquiry = {
   description: string;
   status: string;
   locale?: string;
+  inquiryType?: string | null;
+  rfpFileUrl?: string | null;
+  metadata?: any;
+  notes?: string | null;
+  createdAt: string;
+};
+
+export type JobApplication = {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+  roleApplied: string;
+  applicationType: string;
+  university?: string | null;
+  experienceYears?: string | null;
+  cvUrl?: string | null;
+  status: string;
   notes?: string | null;
   createdAt: string;
 };
@@ -105,6 +125,7 @@ export type MediaItem = {
 export type StudioData = {
   items: Item[];
   inquiries: Inquiry[];
+  applications?: JobApplication[];
   settings: Setting[];
   logs: AuditLog[];
   media?: MediaItem[];
@@ -138,9 +159,10 @@ export function ContentStudio({
   initialData?: StudioData | null;
 }) {
   const [data, setData] = useState<StudioData | null>(initialData ?? null);
-  const [activeTab, setActiveTab] = useState<"overview" | "services" | "products" | "posts" | "media" | "inquiries" | "settings" | "logs">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "services" | "products" | "posts" | "media" | "inquiries" | "careers" | "settings" | "logs">("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
+  const [selectedApplication, setSelectedApplication] = useState<JobApplication | null>(null);
   const [editingItem, setEditingItem] = useState<(Omit<Item, "id" | "updatedAt"> & { id?: number }) | null>(null);
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -289,6 +311,30 @@ export function ContentStudio({
     }
   };
 
+  // Update Application Status
+  const handleUpdateApplicationStatus = async (id: number, status: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "application_status",
+          payload: { id, status },
+        }),
+      });
+
+      if (!res.ok) throw new Error("فشل التحديث");
+      showToast("تم تحديث حالة طلب التوظيف بنجاح");
+      if (selectedApplication) setSelectedApplication({ ...selectedApplication, status });
+      await refreshData();
+    } catch {
+      showToast("حدث خطأ أثناء تحديث حالة الطلب", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Save Settings
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -413,6 +459,7 @@ export function ContentStudio({
   const productsList = useMemo(() => data?.items.filter((i) => i.type === "product") || [], [data]);
   const postsList = useMemo(() => data?.items.filter((i) => i.type === "post") || [], [data]);
   const inquiriesList = useMemo(() => data?.inquiries || [], [data]);
+  const applicationsList = useMemo(() => data?.applications || [], [data]);
 
   const filteredItems = useMemo(() => {
     let list: Item[] = [];
@@ -506,6 +553,16 @@ export function ContentStudio({
           >
             <Inbox className="h-4 w-4" />
             <span>صندوق الاستفسارات ({inquiriesList.length})</span>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab("careers"); setEditingItem(null); }}
+            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition ${
+              activeTab === "careers" ? "bg-cyan text-[#070e1c] shadow-lg shadow-cyan/20" : "bg-white/[0.04] text-[#8ba0be] hover:bg-white/[0.08] hover:text-white"
+            }`}
+          >
+            <GraduationCap className="h-4 w-4" />
+            <span>طلبات التوظيف والتدريب ({applicationsList.length})</span>
           </button>
 
           <button
@@ -1198,6 +1255,21 @@ export function ContentStudio({
                             {inq.company}
                           </span>
                         )}
+                        {inq.inquiryType === "rfp" && (
+                          <span className="rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 text-[10px] font-bold">
+                            كراسة شروط RFP
+                          </span>
+                        )}
+                        {inq.inquiryType === "estimate" && (
+                          <span className="rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 px-2 py-0.5 text-[10px] font-bold">
+                            حاسبة التكلفة
+                          </span>
+                        )}
+                        {inq.inquiryType === "profile_download" && (
+                          <span className="rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2 py-0.5 text-[10px] font-bold">
+                            تحميل البروفايل
+                          </span>
+                        )}
                         <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                           inq.status === "new" ? "bg-emerald-500/10 text-emerald-400" : "bg-white/10 text-[#8ba0be]"
                         }`}>
@@ -1290,6 +1362,24 @@ export function ContentStudio({
                   <p className="text-white leading-relaxed whitespace-pre-wrap">{selectedInquiry.description}</p>
                 </div>
 
+                {selectedInquiry.rfpFileUrl && (
+                  <div className="rounded-xl border border-cyan-500/30 bg-cyan-950/30 p-4 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="text-cyan-300 font-bold block mb-1">ملف كراسة الشروط والمواصفات (RFP) المرفق:</span>
+                      <span className="text-slate-400 font-mono text-[11px] truncate max-w-md block">{selectedInquiry.rfpFileUrl}</span>
+                    </div>
+                    <a
+                      href={selectedInquiry.rfpFileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-primary text-xs py-2 px-3.5 flex items-center gap-1.5 shrink-0"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>تحميل المستند من R2</span>
+                    </a>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between border-t border-white/10 pt-4">
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-[#8ba0be]">تغيير الحالة:</span>
@@ -1315,6 +1405,206 @@ export function ContentStudio({
                       >
                         <Phone className="h-3.5 w-3.5" />
                         <span>فتح واتساب</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ====================================================================
+          TAB 5.5: CAREERS & UNIVERSITY CO-OP APPLICATIONS
+      ==================================================================== */}
+      {activeTab === "careers" && (
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-white/10 bg-[#0c1830] p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <GraduationCap className="h-5 w-5 text-cyan" />
+                  <span>طلبات التوظيف والتدريب التعاوني الجامعي</span>
+                </h3>
+                <p className="text-xs text-[#8ba0be] mt-1">
+                  إدارة المتقدمين للوظائف الشاغرة وبرامج تدريب الجامعات (KFUPM والجامعات السعودية) مع استعراض السير الذاتية المرفوعة على Cloudflare R2
+                </p>
+              </div>
+              <span className="rounded-full bg-cyan/10 px-3.5 py-1 text-xs font-bold text-cyan self-start sm:self-auto">
+                {applicationsList.length} طلب مرشح
+              </span>
+            </div>
+
+            {applicationsList.length === 0 ? (
+              <div className="py-16 text-center text-xs text-[#8ba0be]">لا توجد طلبات توظيف مسجلة حالياً.</div>
+            ) : (
+              <div className="space-y-3">
+                {applicationsList.map((app) => (
+                  <div
+                    key={app.id}
+                    onClick={() => setSelectedApplication(app)}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-white/5 bg-[#081224] p-5 cursor-pointer hover:border-cyan/40 hover:bg-[#0c1c38] transition"
+                  >
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-white text-sm">{app.fullName}</span>
+                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                          app.applicationType === "coop"
+                            ? "bg-purple-500/10 text-purple-300 border border-purple-500/20"
+                            : "bg-blue-500/10 text-blue-300 border border-blue-500/20"
+                        }`}>
+                          {app.applicationType === "coop" ? "تدريب تعاوني" : "شاغر وظيفي"}
+                        </span>
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                          app.status === "new" ? "bg-emerald-500/10 text-emerald-400" : "bg-white/10 text-[#8ba0be]"
+                        }`}>
+                          {app.status === "new" ? "جديد" : app.status}
+                        </span>
+                      </div>
+
+                      <div className="mt-2 text-xs text-cyan-300 font-semibold">
+                        الوظيفة: {app.roleApplied}
+                      </div>
+
+                      <div className="mt-2 flex flex-wrap items-center gap-4 text-[11px] text-[#5a6b7f]">
+                        {app.university && <span>الجامعة: {app.university}</span>}
+                        {app.experienceYears && <span>الخبرة/المعدل: {app.experienceYears}</span>}
+                        <span>{new Date(app.createdAt).toLocaleString("ar-SA")}</span>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      {app.cvUrl && (
+                        <a
+                          href={app.cvUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-cyan/10 border border-cyan/30 px-3 py-1.5 text-xs font-bold text-cyan hover:bg-cyan hover:text-navy transition"
+                          title="تحميل السيرة الذاتية (CV)"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          <span>السيرة الذاتية</span>
+                        </a>
+                      )}
+                      {app.phone && (
+                        <a
+                          href={`https://wa.me/${app.phone.replace(/\D/g, "")}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded-lg bg-emerald-500/10 p-2 text-emerald-400 hover:bg-emerald-500 hover:text-white transition"
+                          title="محادثة واتساب"
+                        >
+                          <Phone className="h-4 w-4" />
+                        </a>
+                      )}
+                      <a
+                        href={`mailto:${app.email}`}
+                        className="rounded-lg bg-white/5 p-2 text-white hover:bg-cyan hover:text-[#070e1c] transition"
+                        title="إرسال بريد"
+                      >
+                        <Mail className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Application Detail Modal */}
+          {selectedApplication && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+              <div className="w-full max-w-2xl rounded-2xl border border-white/10 bg-[#0c1830] p-6 sm:p-8 space-y-6">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{selectedApplication.fullName}</h3>
+                    <p className="text-xs text-cyan-300 font-medium">{selectedApplication.roleApplied}</p>
+                  </div>
+                  <button
+                    onClick={() => setSelectedApplication(null)}
+                    className="text-xs font-semibold text-[#8ba0be] hover:text-white"
+                  >
+                    إغلاق (✕)
+                  </button>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2 text-xs">
+                  <div className="rounded-xl bg-[#081224] p-3.5">
+                    <span className="text-[#8ba0be] block mb-1">البريد الإلكتروني:</span>
+                    <a href={`mailto:${selectedApplication.email}`} className="text-cyan font-semibold hover:underline">
+                      {selectedApplication.email}
+                    </a>
+                  </div>
+                  <div className="rounded-xl bg-[#081224] p-3.5">
+                    <span className="text-[#8ba0be] block mb-1">الهاتف / واتساب:</span>
+                    <span className="text-white font-mono">{selectedApplication.phone}</span>
+                  </div>
+                  <div className="rounded-xl bg-[#081224] p-3.5">
+                    <span className="text-[#8ba0be] block mb-1">نوع الطلب:</span>
+                    <span className="text-white font-semibold">
+                      {selectedApplication.applicationType === "coop" ? "تدريب تعاوني جامعي" : "شاغر وظيفي"}
+                    </span>
+                  </div>
+                  <div className="rounded-xl bg-[#081224] p-3.5">
+                    <span className="text-[#8ba0be] block mb-1">الجامعة / الخبرة:</span>
+                    <span className="text-white font-semibold">
+                      {selectedApplication.university || selectedApplication.experienceYears || "غير محدد"}
+                    </span>
+                  </div>
+                </div>
+
+                {selectedApplication.notes && (
+                  <div className="rounded-xl border border-white/5 bg-[#081224] p-4 text-xs">
+                    <span className="text-[#8ba0be] block font-bold mb-2">نبذة المرشح / الملاحظات:</span>
+                    <p className="text-white leading-relaxed whitespace-pre-wrap">{selectedApplication.notes}</p>
+                  </div>
+                )}
+
+                {selectedApplication.cvUrl && (
+                  <div className="rounded-xl border border-cyan-500/30 bg-cyan-950/30 p-4 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="text-cyan-300 font-bold block mb-1">ملف السيرة الذاتية المرفوع على R2:</span>
+                      <span className="text-slate-400 font-mono text-[11px] truncate max-w-md block">{selectedApplication.cvUrl}</span>
+                    </div>
+                    <a
+                      href={selectedApplication.cvUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-primary text-xs py-2 px-3.5 flex items-center gap-1.5 shrink-0"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>تحميل السيرة الذاتية (CV)</span>
+                    </a>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between border-t border-white/10 pt-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-[#8ba0be]">تغيير حالة المرشح:</span>
+                    <select
+                      value={selectedApplication.status}
+                      onChange={(e) => handleUpdateApplicationStatus(selectedApplication.id, e.target.value)}
+                      className="rounded-lg border border-white/10 bg-[#081224] px-3 py-1.5 text-xs text-white"
+                    >
+                      <option value="new">جديد (New)</option>
+                      <option value="reviewed">تمت المراجعة والتدقيق</option>
+                      <option value="interviewed">تمت المقابلة الفنية</option>
+                      <option value="accepted">تم القبول والموافقة</option>
+                      <option value="rejected">مرفوض</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {selectedApplication.phone && (
+                      <a
+                        href={`https://wa.me/${selectedApplication.phone.replace(/\D/g, "")}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-600 transition"
+                      >
+                        <Phone className="h-3.5 w-3.5" />
+                        <span>فتح واتساب المرشح</span>
                       </a>
                     )}
                   </div>

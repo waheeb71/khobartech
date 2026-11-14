@@ -11,8 +11,11 @@ const schema = z.object({
   phone: z.string().trim().max(50).optional().or(z.literal("")),
   service: z.string().trim().min(2).max(191),
   budget: z.string().trim().max(100).optional().or(z.literal("")),
-  description: z.string().trim().min(10).max(5000),
+  description: z.string().trim().min(5).max(5000),
   locale: z.enum(["ar", "en"]).default("ar"),
+  inquiryType: z.enum(["general", "rfp", "estimate", "profile_download"]).default("general"),
+  rfpFileUrl: z.string().max(500).optional().or(z.literal("")),
+  metadata: z.record(z.any()).optional(),
   website: z.string().max(0).optional(),
 });
 
@@ -51,6 +54,9 @@ export async function POST(request: Request) {
       budget: body.budget || null,
       description: body.description,
       locale: body.locale,
+      inquiryType: body.inquiryType || "general",
+      rfpFileUrl: body.rfpFileUrl || null,
+      metadata: body.metadata || null,
       status: "new",
     });
 

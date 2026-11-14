@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { auditLogs, contactInquiries, contentItems, mediaAssets, siteSettings } from "@/drizzle/schema";
+import { auditLogs, contactInquiries, contentItems, jobApplications, mediaAssets, siteSettings } from "@/drizzle/schema";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { sanitizeRichText } from "@/lib/sanitize";
@@ -42,9 +42,10 @@ export async function GET() {
         isLiveDb: false,
       });
     }
-    const [items, inquiries, settings, logs, mediaRows] = await Promise.all([
+    const [items, inquiries, applications, settings, logs, mediaRows] = await Promise.all([
       db.select().from(contentItems).orderBy(desc(contentItems.updatedAt)).limit(100),
       db.select().from(contactInquiries).orderBy(desc(contactInquiries.createdAt)).limit(100),
+      db.select().from(jobApplications).orderBy(desc(jobApplications.createdAt)).limit(100),
       db.select().from(siteSettings).orderBy(desc(siteSettings.updatedAt)),
       db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt)).limit(50),
       db.select().from(mediaAssets).orderBy(desc(mediaAssets.createdAt)).limit(100),
@@ -55,7 +56,7 @@ export async function GET() {
       url: getR2PublicUrl(m.key),
     }));
 
-    return NextResponse.json({ items, inquiries, settings, logs, media, isLiveDb: true });
+    return NextResponse.json({ items, inquiries, applications, settings, logs, media, isLiveDb: true });
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -150,6 +151,32 @@ export async function POST(request: NextRequest) {
         entityId: String(id),
         details: { newStatus: status, updatedBy: actor.email },
       });
+      return NextResponse.json({ ok: true });
+    }
+
+    // 3.1 UPDATE JOB APPLICATION STATUS
+    if (input.action === "application_status") {
+      const { id, status, notes } = z
+        .object({
+          id: z.number().int(),
+          status: z.string(),
+          notes: z.string().optional(),
+        })
+        .parse(input.payload);
+
+      if (db) {
+        await db
+          .update(jobApplications)
+          .set({ status, notes: notes || null })
+          .where(eq(jobApplications.id, id));
+
+        await db.insert(auditLogs).values({
+          action: "update_application_status",
+          entityType: "career",
+          entityId: String(id),
+          details: { newStatus: status, updatedBy: actor.email },
+        });
+      }
       return NextResponse.json({ ok: true });
     }
 

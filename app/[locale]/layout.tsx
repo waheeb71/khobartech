@@ -4,6 +4,9 @@ import { isLocale } from "@/lib/i18n";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ScrollObserver } from "@/components/ScrollObserver";
+import { PdplConsentBanner } from "@/components/PdplConsentBanner";
+import { AccessibilityToolbar } from "@/components/AccessibilityToolbar";
+import { AiConcierge } from "@/components/AiConcierge";
 
 export default async function LocaleLayout({
   children,
@@ -26,6 +29,9 @@ export default async function LocaleLayout({
       <SiteHeader locale={typedLocale} />
       <main id="main-content">{children}</main>
       <SiteFooter locale={typedLocale} />
+      <PdplConsentBanner locale={typedLocale} />
+      <AccessibilityToolbar locale={typedLocale} />
+      <AiConcierge locale={typedLocale} />
     </div>
   );
 }

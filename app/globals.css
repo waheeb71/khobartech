@@ -992,3 +992,38 @@ html[dir="rtl"] .hero-visual {
   opacity: 1;
   filter: drop-shadow(0 6px 20px rgba(0, 212, 232, 0.3));
 }
+
+/* =======================================
+   DIGITAL ACCESSIBILITY (DGA / WCAG 2.1 AA)
+   ======================================= */
+html.text-size-large {
+  font-size: 115%;
+}
+
+html.text-size-xlarge {
+  font-size: 130%;
+}
+
+html.a11y-high-contrast {
+  filter: contrast(135%);
+  --navy: #000000;
+  --navy-mid: #050a12;
+  --navy-card: #08101e;
+  --ink: #ffffff;
+  --muted: #d0e0f5;
+  --line: rgba(255, 255, 255, 0.35);
+}
+
+html.a11y-highlight-links a {
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 4px !important;
+  color: #00ffff !important;
+}
+
+html.a11y-readable-font body,
+html.a11y-readable-font * {
+  font-family: Arial, Tahoma, "Segoe UI", sans-serif !important;
+  letter-spacing: 0.02em !important;
+  word-spacing: 0.05em !important;
+}

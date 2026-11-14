@@ -2,20 +2,26 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowUpLeft } from "lucide-react";
+import { Menu, X, ArrowUpLeft, UserCircle2 } from "lucide-react";
 import type { Locale } from "@/lib/catalog";
 import { copy, localeHref } from "@/lib/i18n";
 import { Logo } from "@/components/Logo";
+import { DownloadProfileModal } from "@/components/DownloadProfileModal";
 
 export function SiteHeader({ locale }: { locale: Locale }) {
   const [open, setOpen] = useState(false);
   const [solid, setSolid] = useState(false);
   const pathname = usePathname();
   const t = copy[locale];
+  const isAr = locale === "ar";
+
   const links = [
     ["", t.nav.home],
     ["/services", t.nav.services],
     ["/solutions", t.nav.solutions],
+    ["/case-studies", isAr ? "دراسات الحالة" : "Case Studies"],
+    ["/careers", isAr ? "التوظيف والتدريب" : "Careers"],
+    ["/media-center", isAr ? "المركز الإعلامي" : "Media Center"],
     ["/about", t.nav.about],
     ["/blog", t.nav.blog],
     ["/contact", t.nav.contact],
@@ -74,21 +80,30 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             </Link>
           ))}
         </nav>
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden items-center gap-2.5 lg:flex">
+          <DownloadProfileModal locale={locale} />
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold text-slate-300 hover:text-cyan-400 transition"
+            title={isAr ? "بوابة العملاء والدعم الفني" : "Client Portal Login"}
+          >
+            <UserCircle2 className="w-4 h-4 text-cyan-400" />
+            <span>{isAr ? "بوابة الدخول" : "Portal"}</span>
+          </Link>
           <Link
             onClick={chooseLanguage}
             href={languageHref}
-            className="rounded-full px-3 py-2 text-xs font-bold transition-colors duration-150 hover:text-white"
+            className="rounded-full px-2.5 py-1.5 text-xs font-bold transition-colors duration-150 hover:text-white"
             style={{ color: "#8ba0be" }}
           >
             {t.common.language}
           </Link>
           <Link
             href={localeHref(locale, "/contact")}
-            className="btn-primary !min-h-11 !px-5 !py-2.5"
+            className="btn-primary !min-h-10 !px-4 !py-2 text-xs"
           >
             {t.nav.start}
-            <ArrowUpLeft size={15} />
+            <ArrowUpLeft size={14} />
           </Link>
         </div>
         <button

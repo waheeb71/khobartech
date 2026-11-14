@@ -90,7 +90,25 @@ export const contactInquiries = pgTable("contact_inquiries", {
   budget: text("budget"),
   description: text("description").notNull(),
   locale: text("locale").notNull().default("ar"),
+  inquiryType: text("inquiry_type").notNull().default("general"), // 'general' | 'rfp' | 'estimate' | 'profile_download'
+  rfpFileUrl: text("rfp_file_url"),
+  metadata: jsonb("metadata"),
   status: text("status").notNull().default("new"), // 'new' | 'in_progress' | 'contacted' | 'closed'
+  notes: text("notes"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const jobApplications = pgTable("job_applications", {
+  id: serial("id").primaryKey(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  roleApplied: text("role_applied").notNull(),
+  applicationType: text("application_type").notNull().default("job"), // 'job' | 'coop'
+  university: text("university"),
+  experienceYears: text("experience_years"),
+  cvUrl: text("cv_url"),
+  status: text("status").notNull().default("new"), // 'new' | 'reviewed' | 'interviewed' | 'rejected' | 'accepted'
   notes: text("notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

@@ -1,123 +1,143 @@
-import type { Locale } from "@/lib/catalog";
-import { TrendingUp, Clock, ShieldCheck, ArrowUpLeft, ArrowUpRight, FileText } from "lucide-react";
 import Link from "next/link";
-import { localeHref } from "@/lib/i18n";
+import { ArrowLeft, ArrowRight, TrendingUp, CheckCircle, Award, BarChart3, Clock, ShieldCheck } from "lucide-react";
 
-interface CaseStudiesProps {
-  locale: Locale;
+interface CaseStudiesSectionProps {
+  locale: string;
 }
 
-const CASE_STUDIES = [
-  {
-    titleAr: "أتمتة سلاسل الإمداد ومستودعات شركة صناعية كبرى بالجبيل",
-    titleEn: "Supply Chain & Warehouse Digitalization for Jubail Industrial Enterprise",
-    clientAr: "قطاع التصنيع والبتروكيماويات",
-    clientEn: "Manufacturing & Petrochemicals",
-    challengeAr: "تعدد الأنظمة المنفصلة وتأخر إصدار الفواتير الضريبية اليدوية وتكدس شحنات التوريد.",
-    challengeEn: "Fragmented legacy systems, manual billing delays, and warehouse dispatch bottlenecks.",
-    solutionAr: "تطبيق نظام ERP متكامل مع مستودعات سحابية WMS وربط مباشر مع منصة زاتكا المرحلة الثانية.",
-    solutionEn: "Full ERP deployment with cloud WMS and seamless ZATCA Phase 2 automated fiscal clearance.",
-    metrics: [
-      { val: "38%", labelAr: "انخفاض في تكاليف التشغيل", labelEn: "Reduction in operational overhead" },
-      { val: "4x", labelAr: "تسريع إصدار أوامر الشراء", labelEn: "Faster purchase order cycles" },
-      { val: "99.98%", labelAr: "دقة المخزون والفوترة", labelEn: "Inventory and billing precision" },
-    ],
-  },
-  {
-    titleAr: "بناء بنية تحتية آمنة وبوابة خدمات رقمية لمؤسسة صحية بالمنطقة الشرقية",
-    titleEn: "Secure Cloud Core & Patient Digital Portal for Eastern Province Healthcare Group",
-    clientAr: "قطاع الرعاية الصحية",
-    clientEn: "Healthcare & Specialized Clinics",
-    challengeAr: "الحاجة إلى توافق صارم مع معايير NCA لحماية بيانات المرضى والربط مع نظام نفيس الوطني.",
-    challengeEn: "Critical need for NCA compliance, health data confidentiality, and national NPHIES connectivity.",
-    solutionAr: "تصميم سحابة خاصة معتمدة محلياً، وتطبيق ضوابط أمن سيبراني صارمة مع نظام سجلات صحية موحد.",
-    solutionEn: "Locally hosted sovereign private cloud, stringent NCA controls, and unified medical records.",
-    metrics: [
-      { val: "100%", labelAr: "امتثال لضوابط الهيئة الوطنية للأمن السيبراني", labelEn: "NCA regulatory compliance" },
-      { val: "65%", labelAr: "تقليل زمن انتظار المراجعين", labelEn: "Drop in patient wait times" },
-      { val: "0", labelAr: "حوادث أمنية منذ الإطلاق", labelEn: "Security incidents recorded" },
-    ],
-  },
-  {
-    titleAr: "منظومة ذكاء اصطناعي لتحليل سلوك العملاء لمنصة تجارة إلكترونية سريعة النمو",
-    titleEn: "Predictive AI Engine for Rapidly Scaling Saudi E-Commerce Network",
-    clientAr: "قطاع التجارة والخدمات اللوجستية",
-    clientEn: "Omnichannel Commerce",
-    challengeAr: "فقدان فرص بيع بسبب بطء التوصيات وعدم قدرة البنية التحتية على استيعاب مواسم التخفيضات الكبرى.",
-    challengeEn: "Lost cart opportunities and infrastructure strain during massive seasonal shopping peaks.",
-    solutionAr: "هندسة معمارية سحابية مرنة وتدريب نماذج تعلم آلي لتوقع سلوك الشراء وتحسين المخزون.",
-    solutionEn: "Autoscaling cloud architecture paired with predictive ML models for dynamic inventory forecasting.",
-    metrics: [
-      { val: "+45%", labelAr: "ارتفاع في متوسط قيمة السلة", labelEn: "Increase in average basket value" },
-      { val: "2.8M+", labelAr: "طلب تم تنفيذه خلال عطلة اليوم الوطني", labelEn: "Orders processed with zero downtime" },
-      { val: "120ms", labelAr: "متوسط زمن استجابة التوصيات", labelEn: "Average recommendation latency" },
-    ],
-  },
-];
-
-export function CaseStudiesSection({ locale }: CaseStudiesProps) {
+export function CaseStudiesSection({ locale }: CaseStudiesSectionProps) {
   const isAr = locale === "ar";
-  const ArrowIcon = isAr ? ArrowUpLeft : ArrowUpRight;
+
+  const caseStudies = [
+    {
+      slug: "dammam-logistics-zatca-phase-2",
+      tagAr: "الخدمات اللوجستية والموانئ",
+      tagEn: "Logistics & Ports",
+      titleAr: "ربط 14 فرعاً لوجستياً بميناء الملك عبدالعزيز بالدمام مع ZATCA Phase 2 في 4 أسابيع",
+      titleEn: "Connecting 14 Port Logistics Hubs in Dammam to ZATCA Phase 2 in 4 Weeks",
+      challengeAr:
+        "كانت الشركة تعاني من بطء في إصدار الفواتير الجمركية وتعدد الأنظمة المحاسبية المنفصلة، مما عرّضها لمخاطر الغرامات الضريبية وتوقف التخليص الجمركي.",
+      challengeEn:
+        "Client faced severe customs clearing bottlenecks and fragmented accounting systems, risking hefty non-compliance penalties.",
+      solutionAr:
+        "نشرنا بوابة ZATCA Gateway الخاصة بخبر تك، مع ربط إلكتروني فوري (APIs) بقواعد بيانات المستودعات، وتوليد الأختام الرقمية والتشفير اللحظي.",
+      solutionEn:
+        "Deployed Khobar Tech's ZATCA Gateway with automated API middleware connecting disparate databases and instant cryptographic stamping.",
+      metrics: [
+        { num: "0.2s", labelAr: "زمن إصدار وتوقيع الفاتورة", labelEn: "Invoice Signing Latency" },
+        { num: "100%", labelAr: "مطابقة فحص زاتكا (Fatoora)", labelEn: "Fatoora Compliance Pass" },
+        { num: "60%", labelAr: "تسريع وتيرة الفسح الجمركي", labelEn: "Faster Customs Clearance" },
+      ],
+    },
+    {
+      slug: "jubail-petrochemical-cloud-nca",
+      tagAr: "الصناعة والبتروكيماويات",
+      tagEn: "Industrial & Petrochem",
+      titleAr: "ترحيل بنية سحابية هجينة لشركة صناعية كبرى بالجبيل مع الامتثال لضوابط NCA",
+      titleEn: "Migrating Hybrid Cloud for Industrial Giant in Jubail with 100% NCA Alignment",
+      challengeAr:
+        "حاجة ملحة لاستبدال خوادم محلية قديمة تجاوزت عمرها الافتراضي، ونقل أحمال العمل السحابية إلى مراكز بيانات سعودية سيادية متوافقة مع متطلبات الهيئة الوطنية للأمن السيبراني.",
+      challengeEn:
+        "Urgent need to retire aging on-premise hardware and transition to sovereign Saudi cloud zones fully aligned with NCA ECC mandates.",
+      solutionAr:
+        "هندسة بنية سحابية هجينة متطورة على سحابة محلية مع تشفير كامل للبيانات، وجدران حماية الجيل القادم، ومراقبة أمنية على مدار الساعة (24/7 SOC).",
+      solutionEn:
+        "Engineered resilient sovereign hybrid cloud architecture with automated backup failover and 24/7 security operations center monitoring.",
+      metrics: [
+        { num: "99.99%", labelAr: "استمرارية وجاهزية الأنظمة", labelEn: "System Uptime & SLA" },
+        { num: "35%", labelAr: "توفير في تكاليف البنية التحتية", labelEn: "OpEx Infrastructure Savings" },
+        { num: "صفر", labelAr: "انقطاعات أو ثغرات أمنية", labelEn: "Zero Security Vulnerabilities" },
+      ],
+    },
+    {
+      slug: "khobar-smart-wms-retail-chains",
+      tagAr: "التجزئة وسلاسل التوريد",
+      tagEn: "Retail & Supply Chains",
+      titleAr: "أتمتة مستودعات مركزية لـ 28 متجر تجزئة بالمنطقة الشرقية بنظام Khobar WMS",
+      titleEn: "Automating Distribution Center for 28 Retail Branches via Khobar WMS",
+      challengeAr:
+        "نسبة أخطاء بشرية مرتفعة في الجرد اليدوي، وبطء في تحضير الطلبيات وتوزيعها على الفروع في الخبر والدمام والأحساء.",
+      challengeEn:
+        "High manual error rates in legacy inventory audits and sluggish store replenishment across Eastern Province branches.",
+      solutionAr:
+        "تطبيق نظام Khobar Smart WMS مع أجهزة ماسحات الباركود الذكية وتتبع لحظي لمستويات المخزون مع ربطه المباشر بنظام أودو (ERP).",
+      solutionEn:
+        "Implemented Khobar Smart WMS with barcode automation and real-time inventory synchronization directly linked to Odoo ERP.",
+      metrics: [
+        { num: "45%", labelAr: "تسريع تجهيز الطلبات والشحن", labelEn: "Faster Dispatch Cycles" },
+        { num: "99.8%", labelAr: "دقة مطابقة الجرد الفعلي", labelEn: "Inventory Audit Accuracy" },
+        { num: "3x", labelAr: "مضاعفة سعة معالجة الطلبات", labelEn: "Order Throughput Capacity" },
+      ],
+    },
+  ];
 
   return (
-    <section className="section relative border-t border-white/5 bg-[#08101e] py-20">
+    <section className="py-20 sm:py-28 bg-[#091322] border-t border-slate-800" id="case-studies">
       <div className="shell">
-        {/* Header */}
-        <div className="mx-auto max-w-3xl text-center reveal">
-          <div className="inline-flex items-center gap-2 rounded-full border border-cyan/20 bg-cyan/5 px-4 py-1.5 text-xs font-semibold text-cyan">
-            <TrendingUp className="h-3.5 w-3.5" />
-            <span>{isAr ? "الأثر الملموس والنتائج الواقعية" : "Measurable Business Impact"}</span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+          <div className="max-w-2xl">
+            <span className="eyebrow">{isAr ? "سجل الإنجاز وقصص النجاح" : "Proven Track Record"}</span>
+            <h2 className="heading mt-3 text-white">
+              {isAr
+                ? "دراسات حالة موثقة: نتائج هندسية وعائد استثماري حقيقي"
+                : "Enterprise Case Studies: Measurable Impact & Verified ROI"}
+            </h2>
+            <p className="lede mt-3">
+              {isAr
+                ? "لا نكتفي ببرمجة الأنظمة، بل نقيس نجاحنا بالأثر المالي والتشغيلي الذي نحققه لشركائنا في السوق السعودي."
+                : "We do not merely write code; we measure our success by the tangible operational and financial growth delivered to our clients."}
+            </p>
           </div>
-          <h2 className="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
-            {isAr ? "قصص نجاح تثبت كفاءتنا في الميدان" : "Proven Track Record Across Saudi Enterprises"}
-          </h2>
-          <p className="mt-3 text-sm leading-relaxed text-[#8ba0be] sm:text-base">
-            {isAr
-              ? "لا نطرح حلولاً نظرية؛ بل نبني منظومات تقنية تقاس جودتها بالأرقام، خفض التكاليف، وتسريع اتخاذ القرار في بيئات العمل الحقيقية."
-              : "We don't deliver theoretical models. We engineer robust platforms that translate directly into operational savings and market agility."}
-          </p>
+          <Link
+            href={`/${locale}/case-studies`}
+            className="text-link inline-flex items-center gap-2 self-start md:self-end text-sm"
+          >
+            <span>{isAr ? "عرض جميع دراسات الحالة" : "Explore All Case Studies"}</span>
+            {isAr ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
+          </Link>
         </div>
 
-        {/* Case Studies Cards */}
-        <div className="mt-14 grid gap-8 lg:grid-cols-3 reveal-stagger">
-          {CASE_STUDIES.map((study) => (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {caseStudies.map((cs, idx) => (
             <div
-              key={study.titleAr}
-              className="group relative flex flex-col justify-between rounded-2xl border border-white/10 bg-[#0c1830] p-7 transition-all duration-300 hover:border-cyan/40 hover:bg-[#0f1f3e] hover:shadow-[0_20px_45px_rgba(0,0,0,0.4)]"
+              key={idx}
+              className="group rounded-3xl bg-[#0b1628] border border-slate-800 p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 hover:border-cyan-500/50 hover:bg-[#0f1f3d] hover:shadow-2xl hover:shadow-cyan-950/40"
             >
               <div>
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-cyan/10 px-3 py-1 text-xs font-semibold text-cyan">
-                    {isAr ? study.clientAr : study.clientEn}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300">
+                    {isAr ? cs.tagAr : cs.tagEn}
                   </span>
-                  <FileText className="h-4 w-4 text-[#5a6b7f] transition-colors group-hover:text-cyan" />
+                  <BarChart3 className="w-4 h-4 text-cyan-400 opacity-60 group-hover:opacity-100 transition-opacity" />
                 </div>
 
-                <h3 className="mt-5 text-base font-bold leading-snug text-white transition-colors group-hover:text-cyan sm:text-lg">
-                  {isAr ? study.titleAr : study.titleEn}
+                <h3 className="font-bold text-white text-base sm:text-lg leading-snug group-hover:text-cyan-300 transition-colors">
+                  {isAr ? cs.titleAr : cs.titleEn}
                 </h3>
 
-                <div className="mt-4 space-y-3 border-t border-white/5 pt-4 text-xs text-[#8ba0be]">
-                  <div>
-                    <span className="font-semibold text-white/70">{isAr ? "التحدي: " : "Challenge: "}</span>
-                    {isAr ? study.challengeAr : study.challengeEn}
-                  </div>
-                  <div>
-                    <span className="font-semibold text-cyan">{isAr ? "الحل: " : "Solution: "}</span>
-                    {isAr ? study.solutionAr : study.solutionEn}
-                  </div>
+                <div className="mt-4 space-y-2.5 text-xs text-slate-300 leading-relaxed">
+                  <p>
+                    <strong className="text-rose-400 font-semibold">{isAr ? "التحدي: " : "Challenge: "}</strong>
+                    {isAr ? cs.challengeAr : cs.challengeEn}
+                  </p>
+                  <p>
+                    <strong className="text-cyan-400 font-semibold">{isAr ? "الحل الهندسي: " : "Engineering Solution: "}</strong>
+                    {isAr ? cs.solutionAr : cs.solutionEn}
+                  </p>
                 </div>
               </div>
 
-              {/* Metrics Strip */}
-              <div className="mt-7 rounded-xl border border-white/5 bg-[#081020] p-4">
-                <div className="grid grid-cols-3 gap-2 text-center divide-x divide-white/5 rtl:divide-x-reverse">
-                  {study.metrics.map((m) => (
-                    <div key={m.val} className="px-1">
-                      <div className="text-base font-extrabold text-cyan sm:text-lg">
-                        {m.val}
+              <div className="mt-6 pt-5 border-t border-slate-800/80">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-3">
+                  {isAr ? "المؤشرات والنتائج المحققة:" : "Verified Impact Metrics:"}
+                </span>
+                <div className="grid grid-cols-3 gap-2">
+                  {cs.metrics.map((m, mIdx) => (
+                    <div key={mIdx} className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
+                      <div className="text-base sm:text-lg font-black text-cyan-400 leading-tight">
+                        {m.num}
                       </div>
-                      <div className="mt-1 text-[10px] font-medium leading-tight text-[#8ba0be]">
+                      <div className="text-[10px] text-slate-400 mt-1 line-clamp-2 leading-tight">
                         {isAr ? m.labelAr : m.labelEn}
                       </div>
                     </div>
@@ -127,32 +147,7 @@ export function CaseStudiesSection({ locale }: CaseStudiesProps) {
             </div>
           ))}
         </div>
-
-        {/* Bottom CTA bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 rounded-xl border border-white/8 bg-[#0a1528] p-6 sm:flex-row reveal">
-          <div className="flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-lg bg-cyan/10 text-cyan">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-white">
-                {isAr ? "هل لديك مشروع أو مناقصة تتطلب كفاءة مثبتة؟" : "Planning an enterprise RFP or mission-critical overhaul?"}
-              </p>
-              <p className="text-xs text-[#8ba0be]">
-                {isAr ? "فريقنا الهندسي جاهز لمناقشة نطاق العمل وتزويدك بدراسة جدوى فنية." : "Our architects are ready to review your specifications under full confidentiality."}
-              </p>
-            </div>
-          </div>
-          <Link
-            href={localeHref(locale, "/contact")}
-            className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-cyan px-5 py-2.5 text-xs font-bold text-[#0b1628] transition hover:bg-cyan-dark"
-          >
-            <span>{isAr ? "اطلب دراسة حالة تفصيلية" : "Request Detailed Case Study"}</span>
-            <ArrowIcon className="h-3.5 w-3.5" />
-          </Link>
-        </div>
       </div>
     </section>
   );
 }
-

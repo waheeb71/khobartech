@@ -204,6 +204,21 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
                 </Link>
               </li>
               <li>
+                <Link href={localeHref(locale, "/case-studies")} className="transition hover:text-cyan">
+                  {isAr ? "دراسات الحالة وقصص النجاح" : "Case Studies & ROI"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/careers")} className="transition hover:text-cyan">
+                  {isAr ? "التوظيف والتدريب التعاوني" : "Careers & University Co-op"}
+                </Link>
+              </li>
+              <li>
+                <Link href={localeHref(locale, "/media-center")} className="transition hover:text-cyan">
+                  {isAr ? "المركز الإعلامي والفعاليات" : "Media Center & Events"}
+                </Link>
+              </li>
+              <li>
                 <Link href={localeHref(locale, "/contact")} className="transition hover:text-cyan">
                   {isAr ? "طلب عرض سعر ومناقصة (RFP)" : "Submit an RFP / Proposal"}
                 </Link>
@@ -214,8 +229,8 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
                 </Link>
               </li>
               <li>
-                <Link href={localeHref(locale, "/privacy")} className="transition hover:text-cyan">
-                  {isAr ? "سياسة الخصوصية وأمن البيانات" : "Privacy & Data Protection"}
+                <Link href={localeHref(locale, "/privacy")} className="transition hover:text-cyan text-cyan-300">
+                  {isAr ? "سياسة الخصوصية ونظام PDPL" : "Privacy & Saudi PDPL"}
                 </Link>
               </li>
               <li>

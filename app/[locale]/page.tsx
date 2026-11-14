@@ -12,6 +12,10 @@ import { JsonLd } from "@/components/JsonLd";
 import { TechPartners } from "@/components/TechPartners";
 import { SectorsGrid } from "@/components/SectorsGrid";
 import { CaseStudiesSection } from "@/components/CaseStudiesSection";
+import { TrustCertifications } from "@/components/TrustCertifications";
+import { ProjectCostEstimator } from "@/components/ProjectCostEstimator";
+import { SaudiProjectsMap } from "@/components/SaudiProjectsMap";
+import { RfpSubmissionModal } from "@/components/RfpSubmissionModal";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({
@@ -127,7 +131,7 @@ export default async function HomePage({
             <p className="eyebrow">{hero[l].eyebrow}</p>
             <h1 className="hero-title">{hero[l].title}</h1>
             <p className="hero-description">{hero[l].body}</p>
-            <div className="hero-actions">
+            <div className="hero-actions flex-wrap">
               <Link className="btn-primary" href={localeHref(l, "/services")}>
                 {t.hero.primary}
                 <ArrowUpLeft size={17} />
@@ -135,6 +139,7 @@ export default async function HomePage({
               <Link className="btn-secondary" href={localeHref(l, "/contact")}>
                 {t.hero.secondary}
               </Link>
+              <RfpSubmissionModal locale={l} />
             </div>
             <div className="hero-proof">
               {proof.map((item) => (
@@ -196,6 +201,11 @@ export default async function HomePage({
           TECH ECOSYSTEM & COMPLIANCE
       ============================*/}
       <TechPartners locale={l} />
+
+      {/* ============================
+          TRUST & SAUDI CERTIFICATIONS (ZATCA, NCA, ISO)
+      ============================*/}
+      <TrustCertifications locale={l} />
 
       {/* ============================
           QUOTE (MBS)
@@ -492,6 +502,21 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+
+      {/* ============================
+          CASE STUDIES & SUCCESS STORIES
+      ============================*/}
+      <CaseStudiesSection locale={l} />
+
+      {/* ============================
+          INTERACTIVE COST ESTIMATOR
+      ============================*/}
+      <ProjectCostEstimator locale={l} />
+
+      {/* ============================
+          SAUDI REGIONS MAP & COVERAGE
+      ============================*/}
+      <SaudiProjectsMap locale={l} />
 
       {/* ============================
           INSIGHTS

@@ -1,7 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { and, asc, desc, eq } from "drizzle-orm";
-import { auditLogs, contactInquiries, contentItems, mediaAssets, siteSettings, users } from "@/drizzle/schema";
+import { auditLogs, contactInquiries, contentItems, jobApplications, mediaAssets, siteSettings, users } from "@/drizzle/schema";
 import { readLocalStore } from "@/lib/local-store";
 import { getR2PublicUrl } from "@/lib/r2";
 
@@ -79,6 +79,7 @@ export async function getAdminStudioData() {
     return {
       items: store.items,
       inquiries: store.inquiries,
+      applications: [],
       settings: store.settings,
       logs: store.logs,
       media: [],
@@ -86,9 +87,10 @@ export async function getAdminStudioData() {
     };
   }
   try {
-    const [items, inquiries, settings, logs, mediaRows] = await Promise.all([
+    const [items, inquiries, applications, settings, logs, mediaRows] = await Promise.all([
       db.select().from(contentItems).orderBy(desc(contentItems.updatedAt)).limit(100),
       db.select().from(contactInquiries).orderBy(desc(contactInquiries.createdAt)).limit(100),
+      db.select().from(jobApplications).orderBy(desc(jobApplications.createdAt)).limit(100),
       db.select().from(siteSettings).orderBy(desc(siteSettings.updatedAt)),
       db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt)).limit(50),
       db.select().from(mediaAssets).orderBy(desc(mediaAssets.createdAt)).limit(100),
@@ -99,13 +101,14 @@ export async function getAdminStudioData() {
       url: getR2PublicUrl(m.key),
     }));
 
-    return JSON.parse(JSON.stringify({ items, inquiries, settings, logs, media, isLiveDb: true }));
+    return JSON.parse(JSON.stringify({ items, inquiries, applications, settings, logs, media, isLiveDb: true }));
   } catch (err) {
     console.error("DB getAdminStudioData error, falling back to local:", err);
     const store = readLocalStore();
     return {
       items: store.items,
       inquiries: store.inquiries,
+      applications: [],
       settings: store.settings,
       logs: store.logs,
       media: [],
